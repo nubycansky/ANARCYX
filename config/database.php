@@ -64,6 +64,15 @@ return [
             ]) : [],
         ],
 
+        // PASTIKAN BLOK INI ADA DI SINI
+        'mongodb' => [
+            'driver' => 'mongodb',
+            'dsn' => env('DB_URI', 'mongodb://127.0.0.1:27017/'),
+            'database' => env('DB_DATABASE', 'db_anarcyxreptile'),
+        ],
+
+        
+
         'mariadb' => [
             'driver' => 'mariadb',
             'url' => env('DB_URL'),
