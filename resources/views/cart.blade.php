@@ -1,12 +1,8 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Keranjang Belanja - AnarcyxReptile</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-    
+@extends('layouts.public')
+
+@section('title', 'Keranjang Belanja - AnarcyxReptile')
+
+@push('styles')
     <style>
         /* --- PERBAIKAN VISUAL MINIMALIS: CART KOSONG SESUAI REVISI FIGMA --- */
         .cart-empty-wrapper {
@@ -64,25 +60,9 @@
             box-shadow: 0 6px 20px rgba(40, 50, 33, 0.25);
         }
     </style>
-</head>
-<body>
+@endpush
 
-    <nav>
-        <div class="logo-container">
-            <img src="https://via.placeholder.com/40" alt="Logo">
-            <span class="brand-name">ANARCYXREPTILE</span>
-        </div>
-        <ul class="nav-links">
-            <li><a href="{{ route('home') }}">Home</a></li>
-            <li><a href="{{ route('shop') }}">Shop</a></li>
-            <li><a href="{{ route('education') }}">Education</a></li>
-            <li>
-                <a href="{{ route('cart') }}" class="cart-link active-nav">
-                    Cart <span class="cart-count" id="cartCount">0</span>
-                </a>
-            </li>
-        </ul>
-    </nav>
+@section('content')
 
     <main>
         <div class="cart-page-wrapper" id="mainCartPageLayout">
@@ -139,39 +119,9 @@
         </div>
     </div>
 
-    <footer>
-        <div class="footer-grid">
-            <div class="footer-brand">
-                <h3>ANARCYXREPTILE</h3>
-                <p class="footer-desc">
-                    Penyedia reptil eksotis terpercaya. Menghubungkan pecinta hewan dengan partner reptil terbaik yang sehat, legal, dan terawat dengan penuh kasih sayang.
-                </p>
-            </div>
-            
-            <div class="footer-links">
-                <h4>Quick Links</h4>
-                <ul>
-                    <li><a href="{{ route('home') }}">Home</a></li>
-                    <li><a href="{{ route('shop') }}">Shop</a></li>
-                    <li><a href="{{ route('education') }}">Education</a></li>
-                </ul>
-            </div>
-            
-            <div class="footer-contact">
-                <h4>Contact Info</h4>
-                <p>
-                    WhatsApp: +62 812-3456-7890<br>
-                    Email: support@anarcyxreptile.com<br>
-                    Lokasi: Jakarta, Indonesia
-                </p>
-            </div>
-        </div>
-        
-        <div class="footer-bottom-copyright">
-            &copy; 2026 AnarcyxReptile. All Rights Reserved.
-        </div>
-    </footer>
+@endsection
 
+@push('scripts')
     <script>
         const OWNER_PHONE = "6281234567890";
         const SHIPPING_COST = 20000;
@@ -292,5 +242,4 @@
 
         document.addEventListener("DOMContentLoaded", renderCart);
     </script>
-</body>
-</html>
+@endpush

@@ -1,11 +1,8 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $reptile->name }} - Detail Sahabat</title>
-    <link href="https://fonts.googleapis.com/css2 family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+@extends('layouts.public')
+
+@section('title', $reptile->name . ' - Detail Sahabat')
+
+@push('styles')
     <style>
         .detail-wrapper {
             display: grid;
@@ -45,15 +42,9 @@
             .detail-wrapper { grid-template-columns: 1fr; gap: 30px; padding: 40px 5%; }
         }
     </style>
-</head>
-<body>
+@endpush
 
-    <nav>
-        <div class="logo-container">
-            <img src="https://via.placeholder.com/40" alt="Logo">
-            <span class="brand-name">ANARCYXREPTILE</span>
-        </div>
-    </nav>
+@section('content')
 
     <div class="detail-wrapper">
         <div class="detail-image-box">
@@ -79,6 +70,9 @@
         </div>
     </div>
 
+@endsection
+
+@push('scripts')
     <script>
         const OWNER_PHONE = "6281234567890";
         function orderSpesifik(name, price) {
@@ -87,5 +81,4 @@
             window.open(`https://wa.me/${OWNER_PHONE}?text=${encodeURIComponent(msg)}`, '_blank');
         }
     </script>
-</body>
-</html>
+@endpush

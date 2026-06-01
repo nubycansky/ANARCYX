@@ -27,6 +27,7 @@
 
     <nav>
         <div class="logo-container">
+            <img src="{{ asset('images/logo/logo.jpeg') }}" alt="ANARCYX Logo">
             <span class="brand-name">ANARCYXREPTILE</span>
         </div>
         <ul class="nav-links">

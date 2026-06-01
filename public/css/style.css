@@ -24,14 +24,15 @@
     font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
-html, body {
+html {
     height: 100%;
+    overflow-x: hidden;
 }
 
 body {
+    min-height: 100%;
     background-color: var(--bg-light);
     color: #333;
-    overflow-x: hidden;
     display: flex;
     flex-direction: column;
 }
@@ -54,7 +55,8 @@ nav {
     padding: 20px 8%;
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: 1000;
+    flex-shrink: 0;
 }
 
 .logo-container {
@@ -103,6 +105,34 @@ nav {
 .nav-links .active-nav {
     background-color: var(--btn-home);
     color: white !important;
+    position: relative;
+    font-weight: 700;
+}
+
+.nav-links .active-nav::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 3px;
+    background-color: var(--text-accent);
+    border-radius: 2px;
+}
+
+.nav-links .login-link {
+    background-color: var(--btn-beli);
+    color: #FFFFFF !important;
+}
+
+.nav-links .login-link:hover {
+    background-color: #55723e;
+    color: #FFFFFF !important;
+}
+
+.nav-links .cart-link svg {
+    stroke: currentColor;
 }
 
 .menu-toggle {
@@ -177,9 +207,49 @@ header {
     text-align: center;
 }
 
+.section-subtitle {
+    display: block;
+    color: #6B8E4E;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.category-section {
+    background-color: #FFFFFF;
+}
+
+.connect-us-section {
+    background: linear-gradient(135deg, #4A5C3A 0%, #6B8E4E 100%);
+    padding: 70px 8%;
+}
+
+.connect-us-section .section-title {
+    color: #FFFFFF;
+    margin-bottom: 10px;
+}
+
+.connect-us-section .sosmed-card-info h4 {
+    color: #FFFFFF;
+}
+
+.connect-us-section .sosmed-card-info span {
+    color: #E0E0E0;
+}
+
+.connect-us-section .sosmed-icon-circle {
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.sosmed-card.wa .sosmed-icon-circle {
+    background-color: #25D366;
+}
+
 .category-wrapper {
     display: flex;
-    justify-content: flex-start;
+    justify-content: center;
     gap: 40px;
     flex-wrap: wrap;
 }
@@ -404,10 +474,10 @@ header {
 
 /* Search Bar Lebar Penuh & Geser ke Kiri */
 .search-section-wrapper {
-    max-width: 100% !important; /* Mengapus batasan 1400px agar melebar */
+    max-width: 100%;
     width: 100%;
     margin: 40px auto 20px auto;
-    padding: 0 4% !important; /* Padding disesuaikan agar pas dengan grid bawah */
+    padding: 0 4%;
 }
 
 .search-box-flex {
@@ -446,54 +516,16 @@ header {
 .shop-container {
     display: flex;
     gap: 40px;
-    max-width: 100% !important; /* Menghapus batasan 1400px agar layout melebar penuh */
+    max-width: 100%;
     width: 100%;
     margin: 0 auto 60px auto;
-    padding: 0 4% !important; /* Melonggarkan ruang kiri dan kanan layar */
+    padding: 0 4%;
     align-items: flex-start;
 }
 
 /* Sidebar Kotak Filter Sisi Kiri */
 .filter-sidebar {
-    width: 280px; /* Sedikit dikecilkan agar porsi grid produk kanan lebih luas */
-    flex-shrink: 0;
-    background: #FFFFFF;
-    border: 1px solid #E5E5E5;
-    border-radius: 16px;
-    padding: 24px;
-    position: sticky;
-    top: 100px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.01);
-}
-
-/* Sisi Kanan Katalog (Formasi 3 Card) */
-.products-grid-side {
-    flex-grow: 1;
-}
-
-.shop-product-grid-fix {
-    display: grid !important;
-    grid-template-columns: repeat(3, 1fr) !important; /* Tetap 3 Kolom Horizontal */
-    gap: 30px !important; /* Jarak antar card dilegakan */
-    width: 100% !important;
-}
-
-/* Formula Kunci Card Produk */
-.shop-product-grid-fix .product-card {
-    background: #FFFFFF !important;
-    border: 1px solid #E5E5E5 !important;
-    border-radius: 20px !important;
-    padding: 20px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: space-between !important;
-    height: 100% !important;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.02) !important;
-}
-
-/* Sidebar Kotak Filter */
-.filter-sidebar {
-    width: 300px;
+    width: 280px;
     flex-shrink: 0;
     background: #FFFFFF;
     border: 1px solid #E5E5E5;
@@ -548,37 +580,40 @@ header {
 .btn-filter-cancel { background-color: transparent; color: #666666; border: 1px solid #E5E5E5; padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; text-align: center; font-size: 0.9rem; }
 .btn-filter-cancel:hover { background-color: #F5F5F5; }
 
-/* Sisi Kanan Katalog (Formasi 3 Card) */
+/* Sisi Kanan Katalog */
 .products-grid-side {
     flex-grow: 1;
+    min-width: 0;
 }
 
 .shop-product-grid-fix {
-    display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important; /* Terkunci 3 kolom horizontal */
-    gap: 15px !important;
-    width: 100% !important;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    width: 100%;
 }
 
-/* --- PERBAIKAN FORMULA KUNCI AGAR CARD TIDAK KEPOTONG --- */
+/* Formula Kunci Card Produk */
 .shop-product-grid-fix .product-card {
-    background: #FFFFFF !important;
-    border: 1px solid #E5E5E5 !important;
-    border-radius: 20px !important;
-    padding: 20px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: space-between !important;
-    height: 100% !important; /* Menyamakan tinggi box card secara mutlak */
-    box-shadow: 0 10px 30px rgba(0,0,0,0.02) !important;
+    background: #FFFFFF;
+    border: 1px solid #E5E5E5;
+    border-radius: 20px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+    min-width: 0;
+    overflow: hidden;
 }
 
 .shop-product-grid-fix .product-img-wrapper {
-    width: 100% !important;
-    height: 200px !important;
-    border-radius: 12px !important;
+    width: 100%;
+    height: 200px;
+    border-radius: 12px;
     overflow: hidden;
-    margin-bottom: 15px !important;
+    margin-bottom: 15px;
 }
 
 .shop-product-grid-fix .product-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
@@ -593,13 +628,13 @@ header {
     line-height: 1.5;
     margin-bottom: 20px;
     display: -webkit-box;
-    -webkit-line-clamp: 2; /* Memotong teks berlebih jadi '...' setelah baris ke-2 */
+    -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
 
 .shop-product-grid-fix .card-actions {
-    margin-top: auto; /* Memaksa tombol sejajar rapi di bagian bawah */
+    margin-top: auto;
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -755,6 +790,13 @@ header {
 .btn-quick-order { background-color: var(--btn-quick-order); color: white; }
 .btn-quick-order:hover { background-color: #1ebd54; }
 
+.card-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: auto;
+}
+
 /* Pop-up Window Halaman Kosong (Bawaan Lama) */
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
 .modal-overlay.show { opacity: 1; pointer-events: auto; }
@@ -817,6 +859,13 @@ footer {
 }
 
 .footer-brand h3 { color: #FFFFFF; font-size: 1.4rem; margin-bottom: 15px; letter-spacing: 0.5px; }
+
+.footer-logo {
+    width: 50px;
+    height: auto;
+    margin-bottom: 14px;
+    border-radius: 8px;
+}
 .footer-desc { font-size: 0.9rem; line-height: 1.6; max-width: 380px; color: #888888; }
 .footer-links h4, .footer-contact h4 { color: var(--text-accent); font-size: 1.05rem; margin-bottom: 20px; font-weight: 700; }
 .footer-links ul { list-style: none; }
@@ -827,11 +876,38 @@ footer {
 .footer-bottom-copyright { text-align: center; margin-top: 30px; font-size: 0.8rem; color: #444444; }
 
 
+/* --- FILTER TOGGLE BUTTON (MOBILE) --- */
+.filter-toggle-btn {
+    display: none;
+    width: 100%;
+    background-color: var(--btn-add-cart);
+    color: #FFFFFF;
+    border: none;
+    padding: 14px 20px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: background 0.2s ease;
+}
+
+.filter-toggle-btn:hover {
+    background-color: #38462c;
+}
+
+.filter-toggle-btn.active {
+    background-color: #283221;
+}
+
+
 /* ==========================================================================
-   --- MEDIA QUERIES RESPONSIVITAS DEVICE ---
-   ========================================================================== */
+    --- MEDIA QUERIES RESPONSIVITAS DEVICE ---
+    ========================================================================== */
 @media (max-width: 1200px) {
-    .shop-product-grid-fix { grid-template-columns: repeat(2, 1fr) !important; }
+    .shop-product-grid-fix { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 992px) {
@@ -841,10 +917,14 @@ footer {
         padding: 40px 5%;
     }
     .shop-container { flex-direction: column; gap: 30px; }
-    .filter-sidebar { width: 100%; position: static; box-shadow: none; }
-    .shop-product-grid-fix { grid-template-columns: repeat(2, 1fr) !important; }
+    .filter-sidebar { width: 100%; position: static; box-shadow: none; display: none; }
+    .filter-sidebar.open { display: block; }
+    .filter-toggle-btn { display: flex; }
+    .shop-product-grid-fix { grid-template-columns: repeat(2, 1fr); gap: 15px; }
     .cart-summary-block { position: static; }
     .footer-grid { grid-template-columns: 1fr 1fr; }
+    .search-section-wrapper { padding: 0 5%; }
+    .shop-container { padding: 0 5%; }
 }
 
 @media (max-width: 768px) {
@@ -859,13 +939,15 @@ footer {
     .footer-grid { grid-template-columns: 1fr; gap: 30px; }
     .category-wrapper { justify-content: center; }
     .sosmed-wrapper { flex-direction: column; align-items: center; gap: 25px; }
-    
+    .shop-product-grid-fix { gap: 12px; }
     .cart-item-card { grid-template-columns: 70px 1fr auto; gap: 15px; }
     .cart-item-price-block { grid-column: 2; text-align: left; }
     .cart-quantity-block { grid-column: 2; }
 }
 
 @media (max-width: 600px) {
-    .shop-product-grid-fix { grid-template-columns: 1fr !important; }
-    .search-section-wrapper { margin: 20px auto 10px auto; }
+    .shop-product-grid-fix { grid-template-columns: 1fr; gap: 15px; }
+    .search-box-flex { flex-direction: column; gap: 10px; }
+    .btn-search-trigger { padding: 14px; width: 100%; }
 }
+

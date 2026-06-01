@@ -1,30 +1,11 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shop - AnarcyxReptile</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-</head>
-<body>
+@extends('layouts.public')
 
-    <nav>
-        <div class="logo-container">
-            <img src="https://via.placeholder.com/40" alt="Logo">
-            <span class="brand-name">ANARCYXREPTILE</span>
-        </div>
-        <ul class="nav-links">
-            <li><a href="{{ route('home') }}">Home</a></li>
-            <li><a href="{{ route('shop') }}" class="active-nav">Shop</a></li>
-            <li><a href="{{ route('education') }}">Education</a></li>
-            <li>
-                <a href="{{ route('cart') }}" class="cart-link">
-                    Cart <span class="cart-count" id="cartCount">0</span>
-                </a>
-            </li>
-        </ul>
-    </nav>
+@section('title', 'Shop - AnarcyxReptile')
+
+@push('styles')
+@endpush
+
+@section('content')
 
     <div class="search-section-wrapper">
         <div class="search-box-flex">
@@ -35,7 +16,12 @@
 
     <div class="shop-container">
         
-        <aside class="filter-sidebar">
+        <button class="filter-toggle-btn" id="filterToggle" onclick="toggleFilter()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="12" y1="18" x2="20" y2="18"/></svg>
+            Filter
+        </button>
+        
+        <aside class="filter-sidebar" id="filterSidebar">
             <div class="filter-section">
                 <div class="filter-section-title">Jenis Reptil</div>
                 <div class="filter-box-group">
@@ -89,39 +75,9 @@
 
     </div>
 
-    <footer>
-        <div class="footer-grid">
-            <div class="footer-brand">
-                <h3>ANARCYXREPTILE</h3>
-                <p class="footer-desc">
-                    Penyedia reptil eksotis terpercaya. Menghubungkan pecinta hewan dengan partner reptil terbaik yang sehat, legal, dan terawat dengan penuh kasih sayang.
-                </p>
-            </div>
-            
-            <div class="footer-links">
-                <h4>Quick Links</h4>
-                <ul>
-                    <li><a href="{{ route('home') }}">Home</a></li>
-                    <li><a href="{{ route('shop') }}">Shop</a></li>
-                    <li><a href="{{ route('education') }}">Education</a></li>
-                </ul>
-            </div>
-            
-            <div class="footer-contact">
-                <h4>Contact Info</h4>
-                <p>
-                    WhatsApp: +62 812-3456-7890<br>
-                    Email: support@anarcyxreptile.com<br>
-                    Lokasi: Jakarta, Indonesia
-                </p>
-            </div>
-        </div>
-        
-        <div class="footer-bottom-copyright">
-            &copy; 2026 AnarcyxReptile. All Rights Reserved.
-        </div>
-    </footer>
+@endsection
 
+@push('scripts')
     <script>
         const OWNER_PHONE = "6281234567890";
 
@@ -256,11 +212,6 @@
             }).join('');
         }
 
-        function updateCartBadge() {
-            let localCart = localStorage.getItem('anarcyx_cart') ? JSON.parse(localStorage.getItem('anarcyx_cart')) : [];
-            document.getElementById('cartCount').innerText = localCart.reduce((acc, item) => acc + item.qty, 0);
-        }
-
         // Fungsi Add to Cart yang otomatis menyimpan data dan memindahkan rute halaman
         function addToCart(productId) {
             // 1. Cari data objek produk berdasarkan ID yang diklik
@@ -306,8 +257,11 @@
 
         document.addEventListener("DOMContentLoaded", () => {
             renderProducts(ALL_PRODUCTS);
-            updateCartBadge();
         });
+
+        function toggleFilter() {
+            document.getElementById('filterSidebar').classList.toggle('open');
+            document.getElementById('filterToggle').classList.toggle('active');
+        }
     </script>
-</body>
-</html>
+@endpush

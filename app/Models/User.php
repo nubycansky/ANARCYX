@@ -5,10 +5,11 @@ namespace App\Models;
 // 1. Pastikan pakai Authenticatable khusus MongoDB!
 use MongoDB\Laravel\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class User extends Authenticatable
 {
-    use Notifiable;
+    use Notifiable, HasFactory;
 
     protected $connection = 'mongodb';
     protected $collection = 'users';
