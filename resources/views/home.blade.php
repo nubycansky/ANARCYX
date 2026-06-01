@@ -21,8 +21,17 @@
         <h3 class="section-title">Pilih Sahabatmu</h3>
         <div class="category-wrapper">
             @forelse($categories as $cat)
+                @php
+                    $imageMap = [
+                        'iguana'   => 'iguanaFamily.jpg',
+                        'snake'    => 'ularFamily.png',
+                        'tortoise' => 'turtoiseFamily.jpg',
+                        'gecko'    => 'geckoFamily.jpg',
+                    ];
+                    $imageFile = $imageMap[strtolower($cat)] ?? strtolower($cat) . '.jpg';
+                @endphp
                 <a href="{{ route('shop') }}?category={{ urlencode($cat) }}" class="category-circle">
-                    <img src="{{ asset('images/categories/' . strtolower($cat) . '.jpg') }}" alt="{{ $cat }}" loading="lazy">
+                    <img src="{{ asset('images/categories/' . $imageFile) }}" alt="{{ $cat }}" loading="lazy">
                 </a>
             @empty
                 <p style="color:#666;">Kategori belum tersedia.</p>
