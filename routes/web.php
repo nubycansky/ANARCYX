@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
 use App\Models\User;
 use App\Models\Reptile;
@@ -16,6 +17,13 @@ Route::get('/product/{id}', [HomeController::class, 'detail'])->name('product.de
 Route::get('/cart', function () {
     return view('cart');
 })->name('cart');
+
+// Public user authentication (customer login & signup)
+Route::get('/login', [AuthController::class, 'showLogin'])->name('auth.login');
+Route::post('/login', [AuthController::class, 'handleLogin'])->name('auth.handleLogin');
+Route::get('/signup', [AuthController::class, 'showSignup'])->name('auth.signup');
+Route::post('/signup', [AuthController::class, 'handleSignup'])->name('auth.handleSignup');
+Route::post('/logout', [AuthController::class, 'handleLogout'])->name('auth.handleLogout');
 
 Route::get('/seed/{key}', function ($key) {
     if ($key !== 'anarcyx123') {
