@@ -126,15 +126,11 @@
         const OWNER_PHONE = "6281234567890";
         const SHIPPING_COST = 20000;
 
-        // Data awal keranjang jika storage kosong
-        let defaultCart = [
-            { id: "REP001", name: "Rhinoceros Iguana", sciname: "Cyclura Cornuta", price: 350000, qty: 1, image: "https://images.unsplash.com/photo-1601758124510-52d02ddb7cbd?auto=format&fit=crop&q=80&w=150" }
-        ];
-
-        // Memuat data permanen dari storage
-        let localCart = localStorage.getItem('anarcyx_cart') 
+        // localCart sudah di-deklarasikan global di navbar-scripts.blade.php
+        // Sinkronkan ulang dengan localStorage untuk memastikan data terbaru (misal setelah Add to Cart)
+        localCart = localStorage.getItem('anarcyx_cart') 
             ? JSON.parse(localStorage.getItem('anarcyx_cart')) 
-            : defaultCart;
+            : [];
 
         let itemIndexToDelete = null;
 

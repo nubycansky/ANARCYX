@@ -212,41 +212,59 @@
             }).join('');
         }
 
-        // Fungsi Add to Cart yang otomatis menyimpan data dan memindahkan rute halaman
+        // Fungsi Add to Cart - menyimpan data ke keranjang tanpa berpindah halaman
         function addToCart(productId) {
             // 1. Cari data objek produk berdasarkan ID yang diklik
             const product = ALL_PRODUCTS.find(p => p.id === productId);
-            
+
             // 2. Ambil data keranjang lokal saat ini dari browser memory
             let localCart = localStorage.getItem('anarcyx_cart') ? JSON.parse(localStorage.getItem('anarcyx_cart')) : [];
-            
+
             // 3. Cek apakah produk ini sudah pernah dimasukkan sebelumnya
             const existingIndex = localCart.findIndex(item => item.id === productId);
-            
+
             if (existingIndex > -1) {
                 // Jika sudah ada, cukup tambahkan jumlah unitnya (kuantitas)
                 localCart[existingIndex].qty += 1;
             } else {
                 // Jika belum ada, suntikkan data unit baru ke dalam array
-                localCart.push({ 
-                    id: product.id, 
-                    name: product.name, 
-                    sciname: product.sciname, 
-                    price: product.price, 
-                    qty: 1, 
-                    image: product.image 
+                localCart.push({
+                    id: product.id,
+                    name: product.name,
+                    sciname: product.sciname,
+                    price: product.price,
+                    qty: 1,
+                    image: product.image
                 });
             }
-            
+
             // 4. Kunci dan simpan kembali state array terbaru ke localStorage permanen
             localStorage.setItem('anarcyx_cart', JSON.stringify(localCart));
-            
+
             // 5. Perbarui angka badge counter di navbar atas secara real-time
             updateCartBadge();
-            
-            // 6. LANGSUNG PINDAHKAN ROUTE PENGGUNA MASUK KE PAGE CART
-            // Helper route Laravel akan otomatis diterjemahkan menjadi rute '/cart' yang fiks
-            window.location.href = "{{ route('cart') }}";
+
+            // 6. Beri feedback singkat kepada user tanpa berpindah halaman
+            showAddToCartFeedback(product.name);
+        }
+
+        // Feedback visual toast mini setelah Add to Cart berhasil
+        function showAddToCartFeedback(productName) {
+            const existing = document.getElementById('cartFeedbackToast');
+            if (existing) existing.remove();
+
+            const toast = document.createElement('div');
+            toast.id = 'cartFeedbackToast';
+            toast.innerText = `"${productName}" ditambahkan ke keranjang`;
+            toast.style.cssText = 'position:fixed;bottom:30px;right:30px;background:#283221;color:#fff;padding:14px 22px;border-radius:10px;font-weight:600;font-size:0.9rem;z-index:9999;box-shadow:0 8px 20px rgba(0,0,0,0.15);opacity:0;transition:opacity 0.25s ease;';
+            document.body.appendChild(toast);
+
+            requestAnimationFrame(() => { toast.style.opacity = '1'; });
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 2200);
         }
 
         function quickOrder(name, price) {
