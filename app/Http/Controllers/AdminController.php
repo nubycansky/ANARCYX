@@ -315,6 +315,18 @@ class AdminController extends Controller
             ->with('flash_error', 'Pesanan tidak ditemukan.');
     }
 
+    public function deleteOrder($id) {
+        $order = Order::find($id);
+        if ($order) {
+            $label = $order->order_id_string ?? ('#ORD-'.$id);
+            $order->delete();
+            return redirect()->route('admin.orders')
+                ->with('flash_success', 'Pesanan ' . $label . ' berhasil dihapus.');
+        }
+        return redirect()->route('admin.orders')
+            ->with('flash_error', 'Pesanan tidak ditemukan.');
+    }
+
     // ==========================================
     // 5. EDUCATION MANAGEMENT
     // ==========================================

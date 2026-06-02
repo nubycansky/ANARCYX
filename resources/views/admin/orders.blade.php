@@ -77,9 +77,25 @@
         .badge-status.cancelled { background: #FEE2E2; color: #9B1C1C; }
 
         .status-action-form { display: flex; gap: 8px; align-items: center; }
-        .status-action-form select { padding: 8px 10px; border: 1px solid #E5E5E5; border-radius: 6px; font-size: 0.8rem; font-weight: 600; background: white; cursor: pointer; outline: none; }
-        .status-action-form button { padding: 8px 12px; border: none; background: #283221; color: white; border-radius: 6px; font-size: 0.8rem; font-weight: 700; cursor: pointer; }
-        .status-action-form button:hover { background: #4A5C3A; }
+        .status-action-form select { height: 36px; padding: 0 10px; border: 1px solid #E5E5E5; border-radius: 8px; font-size: 0.85rem; font-weight: 600; background: white; cursor: pointer; outline: none; }
+        .status-action-form select:focus { border-color: #6B8E4E; }
+
+        .action-buttons-flex { display: flex; gap: 12px; align-items: center; justify-content: center; }
+        .btn-icon-action { width: 36px; height: 36px; border-radius: 8px; border: 1px solid #E5E5E5; background: white; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: all 0.2s; color: #555555; }
+        .btn-icon-action:hover { border-color: #6B8E4E; background: #F9FAF7; color: #6B8E4E; }
+        .btn-icon-action.delete:hover { border-color: #EF4444; background: #FEE2E2; color: #EF4444; }
+
+        /* POP-UP CONFIRMATION (SAMA DENGAN PRODUCTS) */
+        .confirm-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 600; opacity: 0; transition: opacity 0.3s; }
+        .confirm-overlay.show { display: flex; opacity: 1; }
+        .confirm-box { background: white; border-radius: 16px; padding: 35px; width: 100%; max-width: 420px; text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.15); animation: popScale 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        @keyframes popScale { from { transform: scale(0.8); opacity:0; } to { transform: scale(1); opacity:1; } }
+        .confirm-icon-circle { width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 20px auto; font-size: 1.5rem; }
+        .confirm-title-text { font-size: 1.2rem; font-weight: 800; color: #111; margin-bottom: 25px; line-height: 1.4; }
+        .confirm-buttons-flex { display: flex; gap: 12px; justify-content: center; }
+        .btn-confirm-yes { background-color: #EF4444; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 700; cursor: pointer; flex: 1; }
+        .btn-confirm-cancel { background-color: #F3F4F6; color: #4B5563; border: 1px solid #E5E7EB; padding: 12px 24px; border-radius: 8px; font-weight: 700; cursor: pointer; flex: 1; }
+        .btn-filter-done { background: #283221; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.9rem; }
 
         .flash-success-banner { background: #DEF7EC; color: #03543F; border: 1px solid #BBE5C5; padding: 12px 18px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; margin-bottom: 20px; }
         .flash-error-banner { background: #FEE2E2; color: #9B1C1C; border: 1px solid #FCA5A5; padding: 12px 18px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; margin-bottom: 20px; }
@@ -103,9 +119,6 @@
             </a>
             <a href="{{ route('admin.education') }}">
                 <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg> Education Management
-            </a>
-            <a href="{{ route('admin.notifications') }}">
-                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg> Notifications
             </a>
         </nav>
     </aside>
@@ -211,16 +224,24 @@
                         <td style="font-weight: 800; color: #283221;">Rp {{ number_format((int)($order->total_price ?? 0), 0, ',', '.') }}</td>
                         <td><span class="badge-status {{ $order->status }}">{{ ucfirst($order->status) }}</span></td>
                         <td>
-                            <form action="{{ route('admin.orders.updateStatus', $order->_id) }}" method="POST" class="status-action-form" style="justify-content: center;">
-                                @csrf
-                                <select name="status">
-                                    <option value="pending"   {{ $order->status == 'pending'   ? 'selected' : '' }}>Pending</option>
-                                    <option value="confirmed" {{ $order->status == 'confirmed' ? 'selected' : '' }}>Confirmed</option>
-                                    <option value="delivered" {{ $order->status == 'delivered' ? 'selected' : '' }}>Delivered</option>
-                                    <option value="cancelled" {{ $order->status == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
-                                </select>
-                                <button type="submit">Update</button>
-                            </form>
+                            <div class="action-buttons-flex">
+                                <form action="{{ route('admin.orders.updateStatus', $order->_id) }}" method="POST" class="status-action-form">
+                                    @csrf
+                                    <select name="status">
+                                        <option value="pending"   {{ $order->status == 'pending'   ? 'selected' : '' }}>Pending</option>
+                                        <option value="confirmed" {{ $order->status == 'confirmed' ? 'selected' : '' }}>Confirmed</option>
+                                        <option value="delivered" {{ $order->status == 'delivered' ? 'selected' : '' }}>Delivered</option>
+                                        <option value="cancelled" {{ $order->status == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                                    </select>
+                                    <button type="submit" class="btn-icon-action" title="Update Status">
+                                        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                                    </button>
+                                </form>
+                                <button class="btn-icon-action delete" onclick="triggerDeleteOrder('{{ $order->_id }}', '{{ $order->display_id }}')" title="Delete Order">
+                                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3" /></svg>
+                                </button>
+                                <form id="delete-order-form-{{ $order->_id }}" action="{{ route('admin.orders.delete', $order->_id) }}" method="POST" style="display:none;">@csrf @method('DELETE')</form>
+                            </div>
                         </td>
                     </tr>
                     @empty
@@ -253,7 +274,23 @@
         <div class="footer-bottom-copyright">&copy; 2026 AnarcyxReptile. All Rights Reserved.</div>
     </footer>
 
+    <div class="confirm-overlay" id="feedbackPopupOverlay">
+        <div class="confirm-box" style="max-width: 400px;">
+            <div class="confirm-icon-circle" id="feedbackIconBox" style="background-color: #fee2e2; margin-bottom: 20px;">
+                <span id="feedbackEmoji" style="font-size: 1.5rem;">⚠️</span>
+            </div>
+            <div class="confirm-title-text" id="feedbackTitle" style="font-size: 1.2rem; margin-bottom: 25px; line-height: 1.4;">Apakah Anda yakin ingin menghapus pesanan ini secara permanen dari MongoDB?</div>
+            <div class="confirm-buttons-flex" id="confirmButtonsArea">
+                <button class="btn-confirm-yes" id="btnYesDelete">Ya, Hapus Pesanan</button>
+                <button class="btn-confirm-cancel" onclick="closeFeedbackAlert()">Batalkan</button>
+            </div>
+            <button class="btn-filter-done" id="btnCloseAlert" style="width: 100%; display: none; padding: 12px;" onclick="closeFeedbackAlert()">OK, Mengerti</button>
+        </div>
+    </div>
+
     <script>
+        let deleteOrderTargetFormId = null;
+
         function toggleSidebar() {
             document.getElementById('adminSidebar').classList.toggle('open');
             document.getElementById('sidebarOverlay').classList.toggle('show');
@@ -272,6 +309,51 @@
                 }
             }
         }
+
+        function triggerDeleteOrder(id, displayId) {
+            deleteOrderTargetFormId = "delete-order-form-" + id;
+
+            document.getElementById('feedbackIconBox').style.backgroundColor = "#fee2e2";
+            document.getElementById('feedbackEmoji').innerText = "⚠️";
+            document.getElementById('feedbackTitle').innerText = "Apakah Anda yakin ingin menghapus pesanan " + displayId + " secara permanen dari MongoDB?";
+
+            document.getElementById('confirmButtonsArea').style.display = "flex";
+            document.getElementById('btnCloseAlert').style.display = "none";
+            document.getElementById('feedbackPopupOverlay').classList.add('show');
+        }
+
+        document.getElementById('btnYesDelete').addEventListener('click', () => {
+            if (deleteOrderTargetFormId) {
+                document.getElementById(deleteOrderTargetFormId).submit();
+            }
+        });
+
+        function closeFeedbackAlert() {
+            document.getElementById('feedbackPopupOverlay').classList.remove('show');
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            let flashSuccessMessage = `{!! addslashes(session('flash_success') ?? '') !!}`;
+            let flashErrorMessage = `{!! addslashes(session('flash_error') ?? '') !!}`;
+
+            if (flashSuccessMessage && flashSuccessMessage.trim() !== "") {
+                document.getElementById('feedbackIconBox').style.backgroundColor = "#DEF7EC";
+                document.getElementById('feedbackEmoji').innerText = "✅";
+                document.getElementById('feedbackTitle').innerText = flashSuccessMessage;
+                document.getElementById('confirmButtonsArea').style.display = "none";
+                document.getElementById('btnCloseAlert').style.display = "block";
+                document.getElementById('feedbackPopupOverlay').classList.add('show');
+            }
+
+            if (flashErrorMessage && flashErrorMessage.trim() !== "") {
+                document.getElementById('feedbackIconBox').style.backgroundColor = "#fee2e2";
+                document.getElementById('feedbackEmoji').innerText = "❌";
+                document.getElementById('feedbackTitle').innerText = flashErrorMessage;
+                document.getElementById('confirmButtonsArea').style.display = "none";
+                document.getElementById('btnCloseAlert').style.display = "block";
+                document.getElementById('feedbackPopupOverlay').classList.add('show');
+            }
+        });
     </script>
 </body>
 </html>

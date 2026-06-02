@@ -177,6 +177,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Rute Order Management
     Route::get('/orders', [AdminController::class, 'showOrders'])->name('orders');
     Route::post('/orders/update-status/{id}', [AdminController::class, 'updateOrderStatus'])->name('orders.updateStatus');
+    Route::delete('/orders/delete/{id}', [AdminController::class, 'deleteOrder'])->name('orders.delete');
 
     // Rute Education Management
     Route::get('/education', [AdminController::class, 'showEducation'])->name('education');
