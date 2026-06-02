@@ -21,6 +21,9 @@
         .btn-admin-signin { width: 100%; background-color: #283221; color: white; border: none; padding: 15px; border-radius: 10px; font-weight: 700; font-size: 1rem; cursor: pointer; margin-top: 10px; transition: background 0.2s; }
         .btn-admin-signin:hover { background-color: #3b4930; }
         .err-text { color: red; font-size: 0.85rem; margin-bottom: 15px; text-align: left; font-weight: 600; }
+        .ok-text { color: #2f7a3a; background: #eaf6ec; border: 1px solid #c8e6c9; padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 15px; text-align: left; font-weight: 600; }
+        .back-home-link { display: block; text-align: center; margin-top: 18px; font-size: 0.85rem; color: #888; text-decoration: none; font-weight: 600; }
+        .back-home-link:hover { color: #283221; }
     </style>
 </head>
 <body>
@@ -50,6 +53,10 @@
                 <div class="err-text">{{ $errors->first('login_error') }}</div>
             @endif
 
+            @if(session('flash_success'))
+                <div class="ok-text">{{ session('flash_success') }}</div>
+            @endif
+
             <form action="{{ route('admin.handleLogin') }}" method="POST">
                 @csrf
                 <div class="form-group-block">
@@ -68,6 +75,8 @@
                 </div>
                 <button type="submit" class="btn-admin-signin">Sign In</button>
             </form>
+
+            <a href="{{ route('home') }}" class="back-home-link">&larr; Kembali ke Beranda</a>
         </div>
     </div>
 </body>

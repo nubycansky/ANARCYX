@@ -95,23 +95,27 @@
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
     
     <aside class="admin-sidebar-drawer" id="adminSidebar">
-        <div class="sidebar-brand-title">ANARCYXREPTILE</div>
+        <div class="sidebar-brand-title">ANARCYXREPTILE <span style="font-size:0.75rem; color:#888; display:block; margin-top:4px; font-weight:600;">Admin Panel</span></div>
         <nav class="sidebar-menu-ul">
             <a href="#" class="active-menu">
                 <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z" /></svg>
-                Dashboard
+                Dashboard Overview
             </a>
             <a href="{{ route('admin.products') }}">
                 <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4L4 7m0 0v10l8 4" /></svg>
                 Products
             </a>
-            <a href="{{ route('admin.notifications') }}">
+            <a href="{{ route('admin.orders') }}">
                 <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
-                Orders
+                Order Management
             </a>
-            <a href="#">
+            <a href="{{ route('admin.education') }}">
                 <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
-                Education
+                Education Management
+            </a>
+            <a href="{{ route('admin.notifications') }}">
+                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                Notifications
             </a>
         </nav>
     </aside>
@@ -201,13 +205,13 @@
 
         <section class="chart-grid-2">
             <div class="chart-card">
-                <div class="chart-card-title">Revenue Overview Chart</div>
+                <div class="chart-card-title">Revenue Overview <span style="font-weight:500; color:#888; font-size:0.85rem;">— Monthly revenue and orders</span></div>
                 <div class="chart-wrapper-line">
                     <canvas id="lineChartRevenue"></canvas>
                 </div>
             </div>
             <div class="chart-card">
-                <div class="chart-card-title">Sales by Category Chart</div>
+                <div class="chart-card-title">Sales by Category <span style="font-weight:500; color:#888; font-size:0.85rem;">— Distribution of sales</span></div>
                 <div class="chart-wrapper-pie">
                     <canvas id="pieChartCategory"></canvas>
                 </div>
@@ -224,7 +228,7 @@
                             <div class="number-green-box">{{ $index + 1 }}</div>
                             <span class="product-title-bold">{{ $prod->name }}</span>
                         </div>
-                        <span class="sales-count-gray">8 sales</span>
+                        <span class="sales-count-gray">{{ $prod->sales_count }} sales</span>
                     </div>
                     @empty
                     <div class="sales-count-gray">Katalog produk MongoDB masih kosong.</div>
@@ -238,7 +242,7 @@
                     @forelse($recentOrders as $order)
                     <div class="list-row-item">
                         <div class="item-left-flex">
-                            <span class="product-title-bold" style="color: #6B8E4E;">#ORD-{{ substr($order->_id, -5) }}</span>
+                            <span class="product-title-bold" style="color: #6B8E4E;">{{ $order->order_id_string ?? '#ORD-' . substr((string)$order->_id, -5) }}</span>
                             <span class="sales-count-gray">{{ $order->customer_name ?? 'Guest User' }}</span>
                         </div>
                         <span class="badge-status {{ $order->status }}">{{ $order->status }}</span>

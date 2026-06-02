@@ -4,14 +4,71 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\Reptile;
 use App\Models\Order;
 use App\Models\Notification;
+use App\Models\EducationArticle;
 use Carbon\Carbon;
 
 class AdminController extends Controller
 {
+    // ==========================================
+    // 0. ADMIN AUTH (LOGIN & LOGOUT)
+    // ==========================================
+    public function showLogin() {
+        if (Auth::check() && Auth::user()->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        }
+        return view('admin.login');
+    }
+
+    public function handleLogin(Request $request) {
+        $credentials = $request->validate([
+            'username' => 'required|string',
+            'password' => 'required|string',
+        ]);
+
+        $identifier = $credentials['username'];
+
+        $user = User::where('email', $identifier)
+                    ->orWhere('name', $identifier)
+                    ->first();
+
+        if (!$user) {
+            return back()
+                ->withErrors(['login_error' => 'Username tidak terdaftar di sistem admin.'])
+                ->withInput();
+        }
+
+        if ($user->role !== 'admin') {
+            return back()
+                ->withErrors(['login_error' => 'Akun ini bukan akun administrator.'])
+                ->withInput();
+        }
+
+        if (!Hash::check($credentials['password'], $user->password)) {
+            return back()
+                ->withErrors(['login_error' => 'Password yang kamu masukkan salah.'])
+                ->withInput();
+        }
+
+        Auth::login($user, $request->boolean('remember'));
+        $request->session()->regenerate();
+
+        return redirect()->route('admin.dashboard')
+            ->with('flash_success', 'Selamat datang kembali, ' . $user->name . '!');
+    }
+
+    public function handleLogout(Request $request) {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect()->route('admin.login')
+            ->with('flash_success', 'Kamu telah keluar dari panel admin.');
+    }
+
     // ==========================================
     // 1. DASHBOARD OVERVIEW
     // ==========================================
@@ -27,10 +84,33 @@ class AdminController extends Controller
         $dropdownNotifications = Notification::orderBy('created_at', 'desc')->take(5)->get();
         $unreadNotificationCount = Notification::where('is_read', false)->count();
 
-        $topProducts = Reptile::orderBy('stock', 'asc')->take(5)->get();
+        // HITUNG SALES COUNT PER PRODUK DARI ORDER ITEMS (MongoDB embedded)
+        $salesByProduct = [];
+        foreach (Order::all() as $order) {
+            $items = $order->items ?? [];
+            foreach ($items as $item) {
+                $pid = (string)($item['product_id'] ?? '');
+                $qty = (int)($item['qty'] ?? 0);
+                if ($pid === '') continue;
+                $salesByProduct[$pid] = ($salesByProduct[$pid] ?? 0) + $qty;
+            }
+        }
+
+        // AMBIL TOP 5 PRODUK BERDASARKAN SALES (fallback ke stock kalau belum ada sales)
+        $topProducts = Reptile::all()
+            ->sortByDesc(function ($prod) use ($salesByProduct) {
+                return $salesByProduct[(string)$prod->_id] ?? (int)$prod->stock;
+            })
+            ->take(5)
+            ->map(function ($prod) use ($salesByProduct) {
+                $prod->sales_count = $salesByProduct[(string)$prod->_id] ?? 0;
+                return $prod;
+            })
+            ->values();
+
         $recentOrders = Order::orderBy('_id', 'desc')->take(5)->get();
 
-        // HITUNG DATA KATEGORI REPTIL DI SINI (AGAR JAVASCRIPT BERSIH DARI BLADE)
+        // DATA KATEGORI UNTUK PIE CHART
         $categoryData = [
             Reptile::where('category', 'Snake')->count(),
             Reptile::where('category', 'Iguana')->count(),
@@ -41,7 +121,7 @@ class AdminController extends Controller
         return view('admin.dashboard', compact(
             'totalRevenue', 'totalOrders', 'totalProducts', 'newCustomers', 
             'dropdownNotifications', 'unreadNotificationCount', 'topProducts', 'recentOrders',
-            'categoryData' // Kirim data array ke view
+            'categoryData'
         ));
     }
 
@@ -173,5 +253,145 @@ class AdminController extends Controller
             }
         }
         return view('admin.notifications', compact('recentNotifications', 'lastWeekNotifications'));
+    }
+
+    // ==========================================
+    // 4. ORDER MANAGEMENT
+    // ==========================================
+    public function showOrders(Request $request) {
+        $query = Order::query();
+
+        if ($request->filled('search')) {
+            $term = $request->search;
+            $query->where(function ($q) use ($term) {
+                $q->where('order_id_string', 'like', '%' . $term . '%')
+                  ->orWhere('customer_name', 'like', '%' . $term . '%');
+            });
+        }
+
+        if ($request->filled('status') && $request->status !== 'all') {
+            $query->where('status', $request->status);
+        }
+
+        $orders = $query->orderBy('_id', 'desc')->get()->map(function ($order) {
+            $items = $order->items ?? [];
+            $order->item_count = array_sum(array_map(fn($i) => (int)($i['qty'] ?? 0), $items));
+            $order->display_id = $order->order_id_string ?? ('#ORD-' . substr((string)$order->_id, -5));
+            $order->display_date = $order->created_at
+                ? Carbon::parse($order->created_at)->format('n/j/Y')
+                : '-';
+            return $order;
+        });
+
+        $stats = [
+            'total'     => Order::count(),
+            'delivered' => Order::where('status', 'delivered')->count(),
+            'confirmed' => Order::where('status', 'confirmed')->count(),
+            'pending'   => Order::where('status', 'pending')->count(),
+        ];
+
+        $dropdownNotifications = Notification::orderBy('created_at', 'desc')->take(5)->get();
+        $unreadNotificationCount = Notification::where('is_read', false)->count();
+
+        return view('admin.orders', compact(
+            'orders', 'stats',
+            'dropdownNotifications', 'unreadNotificationCount'
+        ));
+    }
+
+    public function updateOrderStatus(Request $request, $id) {
+        $request->validate([
+            'status' => 'required|in:pending,confirmed,delivered,cancelled',
+        ]);
+
+        $order = Order::find($id);
+        if ($order) {
+            $order->status = $request->status;
+            $order->save();
+            return redirect()->route('admin.orders')
+                ->with('flash_success', 'Status pesanan ' . ($order->order_id_string ?? '#ORD-'.$id) . ' diperbarui menjadi ' . ucfirst($request->status) . '.');
+        }
+        return redirect()->route('admin.orders')
+            ->with('flash_error', 'Pesanan tidak ditemukan.');
+    }
+
+    // ==========================================
+    // 5. EDUCATION MANAGEMENT
+    // ==========================================
+    public function showEducation(Request $request) {
+        $query = EducationArticle::query();
+
+        if ($request->filled('search')) {
+            $term = $request->search;
+            $query->where(function ($q) use ($term) {
+                $q->where('title', 'like', '%' . $term . '%')
+                  ->orWhere('preview', 'like', '%' . $term . '%');
+            });
+        }
+
+        if ($request->filled('category') && $request->category !== 'all') {
+            $query->where('category', $request->category);
+        }
+
+        $articles = $query->orderBy('_id', 'desc')->get();
+
+        $stats = [
+            'total'    => EducationArticle::count(),
+            'general'  => EducationArticle::where('category', 'General')->count(),
+            'habitat'  => EducationArticle::where('category', 'Habitat')->count(),
+            'diet'     => EducationArticle::where('category', 'Diet')->count(),
+        ];
+
+        $dropdownNotifications = Notification::orderBy('created_at', 'desc')->take(5)->get();
+        $unreadNotificationCount = Notification::where('is_read', false)->count();
+
+        return view('admin.education', compact(
+            'articles', 'stats',
+            'dropdownNotifications', 'unreadNotificationCount'
+        ));
+    }
+
+    public function storeArticle(Request $request) {
+        $data = $request->validate([
+            'title'    => 'required|string|max:200',
+            'category' => 'required|in:General,Habitat,Diet,Health',
+            'preview'  => 'required|string|max:255',
+            'content'  => 'required|string',
+        ]);
+
+        EducationArticle::create($data);
+
+        return redirect()->route('admin.education')
+            ->with('flash_success', 'Artikel edukasi "' . $data['title'] . '" berhasil ditambahkan.');
+    }
+
+    public function updateArticle(Request $request, $id) {
+        $data = $request->validate([
+            'title'    => 'required|string|max:200',
+            'category' => 'required|in:General,Habitat,Diet,Health',
+            'preview'  => 'required|string|max:255',
+            'content'  => 'required|string',
+        ]);
+
+        $article = EducationArticle::find($id);
+        if ($article) {
+            $article->update($data);
+            return redirect()->route('admin.education')
+                ->with('flash_success', 'Artikel "' . $data['title'] . '" berhasil diperbarui.');
+        }
+        return redirect()->route('admin.education')
+            ->with('flash_error', 'Artikel tidak ditemukan.');
+    }
+
+    public function deleteArticle($id) {
+        $article = EducationArticle::find($id);
+        if ($article) {
+            $title = $article->title;
+            $article->delete();
+            return redirect()->route('admin.education')
+                ->with('flash_success', 'Artikel "' . $title . '" berhasil dihapus.');
+        }
+        return redirect()->route('admin.education')
+            ->with('flash_error', 'Artikel tidak ditemukan.');
     }
 }

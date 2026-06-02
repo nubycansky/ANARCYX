@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Reptile;
 use App\Models\Order;
 use App\Models\Notification;
+use App\Models\EducationArticle;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 
@@ -34,6 +35,7 @@ Route::get('/seed/{key}', function ($key) {
     Reptile::truncate();
     Order::truncate();
     Notification::truncate();
+    EducationArticle::truncate();
 
     User::create([
         'name' => 'Sultan',
@@ -127,14 +129,42 @@ Route::get('/seed/{key}', function ($key) {
         'created_at' => now()->subDays(6)->toDateTimeString()
     ]);
 
-    return 'Database seeded successfully! 3 reptiles, admin user, orders & notifications created.';
+    EducationArticle::create([
+        'title' => "Beginner's Guide to Reptile Care",
+        'category' => 'General',
+        'preview' => 'Starting with reptiles requires understanding the basics of temperature, handling, and quarantine for new units.',
+        'content' => 'Panduan lengkap untuk pemula yang ingin memulai hobi reptil. Mulai dari pemilihan species, penyiapan enclosure, hingga penanganan awal hewan stres dan masa karantina unit baru. Pastikan suhu, kelembaban, dan pencahayaan UVB sesuai kebutuhan species masing-masing.'
+    ]);
+
+    EducationArticle::create([
+        'title' => "Setting Up the Ideal Enclosure Temperature",
+        'category' => 'Habitat',
+        'preview' => 'Pentingnya pembagian area basking spot dan cool spot untuk siklus termoregulasi alami reptil.',
+        'content' => 'Suhu enclosure yang ideal terbagi menjadi area berjemur (basking spot) di 32-38°C dan area dingin (cool spot) di 24-26°C. Gunakan termometer digital di kedua sisi untuk monitoring real-time, dan lampu UVB untuk membantu metabolisme kalsium.'
+    ]);
+
+    EducationArticle::create([
+        'title' => 'Nutrition, Vitamin & Calcium Requirements',
+        'category' => 'Diet',
+        'preview' => 'Cara pemberian dusting suplemen bubuk yang benar pada serangga pakan agar terhindari dari MBD.',
+        'content' => 'Dusting adalah teknik membaluri serangga pakan dengan bubuk kalsium atau vitamin. Lakukan 2-3x seminggu untuk juvenile dan 1x seminggu untuk adult. Pastikan rasio kalsium:fosphor seimbang untuk mencegah Metabolic Bone Disease (MBD).'
+    ]);
+
+    EducationArticle::create([
+        'title' => 'Recognizing Signs of Illness in Reptiles',
+        'category' => 'Health',
+        'preview' => 'Deteksi awal gejala infeksi saluran pernapasan (RI), mogok makan, dan masalah pencernaan.',
+        'content' => 'Tanda reptil sakit antara lain: lendir berlebih di mulut/hidung (respiratory infection), lesu, tidak mau makan >2 minggu, feses abnormal, dan perubahan warna kulit. Segera konsultasi ke dokter hewan reptil terdekat jika menemukan tanda-tanda ini.'
+    ]);
+
+    return 'Database seeded successfully! 3 reptiles, admin user, orders, notifications & 4 education articles created.';
 })->where('key', '.*');
 
 Route::get('/admin/login', [AdminController::class, 'showLogin'])->name('admin.login');
 Route::post('/admin/login', [AdminController::class, 'handleLogin'])->name('admin.handleLogin');
 Route::post('/admin/logout', [AdminController::class, 'handleLogout'])->name('admin.logout');
 
-Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
     Route::get('/notifications', [AdminController::class, 'showAllNotifications'])->name('notifications');
     
@@ -143,4 +173,14 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::post('/products/store', [AdminController::class, 'storeProduct'])->name('products.store');
     Route::post('/products/update/{id}', [AdminController::class, 'updateProduct'])->name('products.update');
     Route::delete('/products/delete/{id}', [AdminController::class, 'deleteProduct'])->name('products.delete');
+
+    // Rute Order Management
+    Route::get('/orders', [AdminController::class, 'showOrders'])->name('orders');
+    Route::post('/orders/update-status/{id}', [AdminController::class, 'updateOrderStatus'])->name('orders.updateStatus');
+
+    // Rute Education Management
+    Route::get('/education', [AdminController::class, 'showEducation'])->name('education');
+    Route::post('/education/store', [AdminController::class, 'storeArticle'])->name('education.store');
+    Route::post('/education/update/{id}', [AdminController::class, 'updateArticle'])->name('education.update');
+    Route::delete('/education/delete/{id}', [AdminController::class, 'deleteArticle'])->name('education.delete');
 });

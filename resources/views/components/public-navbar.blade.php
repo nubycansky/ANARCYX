@@ -37,6 +37,12 @@
                     Login
                 </a>
             </li>
+            <li>
+                <a href="{{ route('admin.login') }}" @class(['login-link', 'admin-login-link', 'active-nav' => request()->routeIs('admin.login', 'admin.handleLogin')]) title="Login Admin">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 11c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4zM19 11h2v2h-2zm-2-4h4v2h-4z"/></svg>
+                    Login Admin
+                </a>
+            </li>
         @endauth
     </ul>
 </nav>
