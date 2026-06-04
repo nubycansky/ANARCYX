@@ -11,9 +11,11 @@ class Order extends Model
 
     protected $fillable = [
         'user_id',
+        'customer_name',
+        'order_id_string',
         'total_price',
         'status',
         'shipping_address',
-        'items' // <-- Di sini kehebatan MongoDB (Embedding) bekerja!
+        'items'
     ];
 }

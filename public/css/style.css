@@ -131,16 +131,6 @@ nav {
     color: #FFFFFF !important;
 }
 
-.nav-links .admin-login-link {
-    background-color: #283221;
-    color: #FFFFFF !important;
-    border: 1px solid #1c2417;
-}
-
-.nav-links .admin-login-link:hover {
-    background-color: #1c2417;
-    color: #FFFFFF !important;
-}
 
 .nav-links .cart-link svg {
     stroke: currentColor;
@@ -375,6 +365,9 @@ header {
     font-size: 1.2rem;
     font-weight: 800;
     color: #111;
+}
+.product-name:hover {
+    color: #6B8E4E !important;
 }
 
 .product-price {
@@ -676,12 +669,12 @@ header {
     padding: 60px 8%;
 }
 
-.cart-items-side { display: flex; flex-direction: column; gap: 20px; }
+.cart-items-side { display: flex; flex-direction: column; }
 .cart-title { font-size: 2.2rem; font-weight: 800; color: #111; margin-bottom: 20px; }
 
 .cart-item-card {
     background: white; border-radius: 15px; padding: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.01);
-    display: grid; grid-template-columns: 80px 2.5fr 1fr 1.2fr auto; gap: 20px; align-items: center;
+    display: grid; grid-template-columns: 80px 2.5fr 1fr 1.2fr auto; gap: 20px; align-items: center; margin-bottom: 20px;
 }
 .cart-item-img { width: 80px; height: 80px; border-radius: 10px; object-fit: cover; }
 .cart-item-info-block { display: flex; flex-direction: column; gap: 3px; }

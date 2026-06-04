@@ -17,11 +17,9 @@
         .nav-right-side { display: flex; align-items: center; gap: 25px; margin-left: auto; font-weight: 700; position: relative; }
         .admin-profile-wrapper { display: flex; align-items: center; gap: 10px; }
         .profile-img-circle { width: 38px; height: 38px; border-radius: 50%; border: 2px solid #283221; background-color: #4A5C3A; }
-        .btn-logout-red { background-color: #dc2626 !important; color: #ffffff !important; border: none; padding: 10px 18px; border-radius: 6px; font-weight: 700; font-size: 0.85rem; cursor: pointer; text-decoration: none; transition: background 0.2s; }
-        .btn-logout-red:hover { background-color: #b91c1c !important; }
 
         .noti-bell-container { position: relative; cursor: pointer; color: #333; display: flex; align-items: center; }
-        .bell-badge-red { position: absolute; top: -4px; right: -4px; background-color: #ef4444; color: white; font-size: 0.65rem; font-weight: 800; padding: 2px 6px; border-radius: 10px; border: 2px solid #FFFFFF; }
+        .bell-badge-red { position: absolute; top: 2px; right: 2px; width: 10px; height: 10px; background-color: #ef4444; border-radius: 50%; border: 1.5px solid #FFFFFF; display: block; }
 
         .floating-noti-dropdown { position: absolute; top: 50px; right: 170px; width: 340px; background: #FFFFFF; border: 1px solid #E5E5E5; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); display: none; flex-direction: column; z-index: 100; overflow: hidden; }
         .floating-noti-dropdown.show { display: flex; }
@@ -40,6 +38,12 @@
         .sidebar-menu-ul a:hover, .sidebar-menu-ul .active-menu { background: #283221; color: #FFFFFF; }
         .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 150; display: none; backdrop-filter: blur(3px); }
         .sidebar-overlay.show { display: block; }
+
+        /* SIDEBAR FLEX LAYOUT & LOGOUT BUTTON */
+        .sidebar-inner-flex { display: flex; flex-direction: column; height: 100%; }
+        .sidebar-logout-form { margin-top: auto; width: 100%; padding-top: 20px; }
+        .sidebar-logout-btn { width: 100%; background-color: #dc2626; color: #ffffff; border: none; padding: 12px 18px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .sidebar-logout-btn:hover { background-color: #b91c1c; }
 
         .dashboard-main-content { max-width: 100%; width: 100%; margin: 40px auto; padding: 0 4%; }
 
@@ -106,21 +110,32 @@
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
     <aside class="admin-sidebar-drawer" id="adminSidebar">
-        <div class="sidebar-brand-title">ANARCYXREPTILE <span style="font-size:0.75rem; color:#888; display:block; margin-top:4px; font-weight:600;">Admin Panel</span></div>
-        <nav class="sidebar-menu-ul">
-            <a href="{{ route('admin.dashboard') }}">
-                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z" /></svg> Dashboard Overview
-            </a>
-            <a href="{{ route('admin.products') }}">
-                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4L4 7m0 0v10l8 4" /></svg> Products
-            </a>
-            <a href="{{ route('admin.orders') }}" class="active-menu">
-                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg> Order Management
-            </a>
-            <a href="{{ route('admin.education') }}">
-                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg> Education Management
-            </a>
-        </nav>
+        <div class="sidebar-inner-flex">
+            <div>
+                <div class="sidebar-brand-title">ANARCYXREPTILE <span style="font-size:0.75rem; color:#888; display:block; margin-top:4px; font-weight:600;">Admin Panel</span></div>
+                <nav class="sidebar-menu-ul">
+                    <a href="{{ route('admin.dashboard') }}">
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z" /></svg> Dashboard
+                    </a>
+                    <a href="{{ route('admin.products') }}">
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4L4 7m0 0v10l8 4" /></svg> Product
+                    </a>
+                    <a href="{{ route('admin.orders') }}" class="active-menu">
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg> Order
+                    </a>
+                    <a href="{{ route('admin.education') }}">
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg> Education
+                    </a>
+                </nav>
+            </div>
+            <form action="{{ route('admin.logout') }}" method="POST" class="sidebar-logout-form">
+                @csrf
+                <button type="submit" class="sidebar-logout-btn">
+                    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                    Log Out
+                </button>
+            </form>
+        </div>
     </aside>
 
     <div class="admin-navbar">
@@ -134,7 +149,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                 </svg>
                 @if($unreadNotificationCount > 0)
-                    <span class="bell-badge-red">{{ $unreadNotificationCount }}</span>
+                    <span class="bell-badge-red"></span>
                 @endif
             </div>
 
@@ -158,7 +173,6 @@
                 <div class="profile-img-circle"></div>
             </div>
 
-            <button class="btn-logout-red" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Log Out</button>
             <form id="logout-form" action="{{ route('admin.logout') }}" method="POST" style="display: none;">@csrf</form>
         </div>
     </div>
@@ -252,27 +266,7 @@
         </section>
     </main>
 
-    <footer>
-        <div class="footer-grid">
-            <div class="footer-brand">
-                <h3>ANARCYXREPTILE</h3>
-                <p class="footer-desc">Penyedia reptil eksotis terpercaya berkualitas tinggi, sehat, dan aman.</p>
-            </div>
-            <div class="footer-links">
-                <h4>Quick Links</h4>
-                <ul>
-                    <li><a href="{{ route('home') }}">Shop</a></li>
-                    <li><a href="{{ route('education') }}">Education</a></li>
-                    <li><a href="{{ route('cart') }}">Cart</a></li>
-                </ul>
-            </div>
-            <div class="footer-contact">
-                <h4>Contact</h4>
-                <p>WhatsApp: +62 812-3456-7890<br>Jakarta, Indonesia</p>
-            </div>
-        </div>
-        <div class="footer-bottom-copyright">&copy; 2026 AnarcyxReptile. All Rights Reserved.</div>
-    </footer>
+
 
     <div class="confirm-overlay" id="feedbackPopupOverlay">
         <div class="confirm-box" style="max-width: 400px;">
@@ -292,9 +286,30 @@
         let deleteOrderTargetFormId = null;
 
         function toggleSidebar() {
-            document.getElementById('adminSidebar').classList.toggle('open');
-            document.getElementById('sidebarOverlay').classList.toggle('show');
+            var sidebar = document.getElementById('adminSidebar');
+            var overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('show');
+            localStorage.setItem('sidebarStatus', sidebar.classList.contains('open') ? 'open' : 'closed');
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (localStorage.getItem('sidebarStatus') === 'open') {
+                document.getElementById('adminSidebar').classList.add('open');
+                document.getElementById('sidebarOverlay').classList.add('show');
+            }
+        });
+
+        document.addEventListener('click', function(event) {
+            var sidebar = document.getElementById('adminSidebar');
+            if (sidebar.classList.contains('open')) {
+                if (!sidebar.contains(event.target) && !event.target.closest('.btn-hamburger')) {
+                    sidebar.classList.remove('open');
+                    document.getElementById('sidebarOverlay').classList.remove('show');
+                    localStorage.setItem('sidebarStatus', 'closed');
+                }
+            }
+        });
 
         function toggleNotiPanel(event) {
             event.stopPropagation();

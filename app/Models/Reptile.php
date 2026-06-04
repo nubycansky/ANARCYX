@@ -15,11 +15,12 @@ class Reptile extends Model
 
     // 4. Kolom apa aja yang boleh diisi nanti (Mass Assignment)
     protected $fillable = [
-        'name', 
-        'category', 
-        'attributes', // Nampung detail kayak umur, berat, morph (bentuk JSON)
-        'price', 
-        'stock', 
-        'image'
+        'name',
+        'category',
+        'attributes',
+        'price',
+        'stock',
+        'image',
+        'desc'
     ];
 }

@@ -17,16 +17,13 @@
         .btn-hamburger { background: none; border: none; font-size: 2rem; cursor: pointer; color: #111; font-weight: 800; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 8px; transition: background 0.2s; }
         .btn-hamburger:hover { background-color: #F5F5F5; }
         
-        /* Navigasi Kanan Berjejer Memanjang Rapi */
         .nav-right-side { display: flex; align-items: center; gap: 25px; margin-left: auto; font-weight: 700; position: relative; }
         .admin-profile-wrapper { display: flex; align-items: center; gap: 10px; }
         .profile-img-circle { width: 38px; height: 38px; border-radius: 50%; border: 2px solid #283221; background-color: #4A5C3A; }
-        .btn-logout-red { background-color: #dc2626 !important; color: #ffffff !important; border: none; padding: 10px 18px; border-radius: 6px; font-weight: 700; font-size: 0.85rem; cursor: pointer; text-decoration: none; transition: background 0.2s; }
-        .btn-logout-red:hover { background-color: #b91c1c !important; }
 
-        /* Lonceng & Dropdown Notifikasi Rapi */
+
         .noti-bell-container { position: relative; cursor: pointer; color: #333; display: flex; align-items: center; }
-        .bell-badge-red { position: absolute; top: -4px; right: -4px; background-color: #ef4444; color: white; font-size: 0.65rem; font-weight: 800; padding: 2px 6px; border-radius: 10px; border: 2px solid #FFFFFF; }
+        .bell-badge-red { position: absolute; top: 2px; right: 2px; width: 10px; height: 10px; background-color: #ef4444; border-radius: 50%; border: 1.5px solid #FFFFFF; display: block; }
         
         .floating-noti-dropdown { position: absolute; top: 50px; right: 170px; width: 340px; background: #FFFFFF; border: 1px solid #E5E5E5; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); display: none; flex-direction: column; z-index: 100; overflow: hidden; }
         .floating-noti-dropdown.show { display: flex; }
@@ -37,7 +34,7 @@
         .btn-read-more-noti { display: block; text-align: center; padding: 12px; background: #F9FAF7; font-size: 0.85rem; font-weight: 700; color: #4A5C3A; text-decoration: none; border-top: 1px solid #E5E5E5; }
         .btn-read-more-noti:hover { background: #F3F4F0; }
 
-        /* SIDEBAR DRAWER PANEL RATA KIRI PENUH */
+        /* SIDEBAR DRAWER PANEL */
         .admin-sidebar-drawer { position: fixed; top: 0; left: -300px; width: 300px; height: 100%; background: #000000; color: white; z-index: 200; padding: 35px 24px; transition: left 0.3s ease; }
         .admin-sidebar-drawer.open { left: 0; }
         .sidebar-brand-title { font-size: 1.3rem; font-weight: 800; margin-bottom: 40px; color: #FFFFFF; text-align: left; }
@@ -46,6 +43,12 @@
         .sidebar-menu-ul a:hover, .sidebar-menu-ul .active-menu { background: #283221; color: #FFFFFF; }
         .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 150; display: none; backdrop-filter: blur(3px); }
         .sidebar-overlay.show { display: block; }
+
+        /* SIDEBAR FLEX LAYOUT & LOGOUT BUTTON */
+        .sidebar-inner-flex { display: flex; flex-direction: column; height: 100%; }
+        .sidebar-logout-form { margin-top: auto; width: 100%; padding-top: 20px; }
+        .sidebar-logout-btn { width: 100%; background-color: #dc2626; color: #ffffff; border: none; padding: 12px 18px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .sidebar-logout-btn:hover { background-color: #b91c1c; }
 
         /* CONTENT LAYOUT */
         .dashboard-main-content { max-width: 100%; width: 100%; margin: 40px auto; padding: 0 4%; }
@@ -56,17 +59,16 @@
         .stat-card-title { font-size: 0.85rem; color: #888; font-weight: 600; margin-bottom: 5px; }
         .stat-card-number { font-size: 1.6rem; font-weight: 800; color: #111; }
 
-        /* ALAT KONTROL TOOLBAR - REVISI INPUT DENGAN IKON OUTLINE TIPIS */
+        /* ALAT KONTROL TOOLBAR - INPUT DENGAN IKON OUTLINE TIPIS */
         .toolbar-flex-control { display: flex; justify-content: space-between; align-items: center; gap: 20px; margin-bottom: 25px; }
         .search-filter-left { display: flex; gap: 15px; flex: 1; }
         
-        /* Wrapper Input Search */
         .search-wrapper-relative { position: relative; width: 300px; display: flex; align-items: center; }
         .search-wrapper-relative svg { position: absolute; left: 16px; color: #888888; pointer-events: none; }
         .search-input-box { width: 100%; padding: 12px 16px 12px 46px; border: 1px solid #E5E5E5; border-radius: 8px; font-size: 0.9rem; font-weight: 600; outline: none; transition: border-color 0.2s; }
         .search-input-box:focus { border-color: #6B8E4E; }
 
-        /* Wrapper Select Dropdown Kategori Rapi di Tengah */
+        /* Dropdown Kategori Berpanah Tengah Rapi */
         .select-wrapper-relative { position: relative; display: flex; align-items: center; }
         .filter-select-box { padding: 12px 40px 12px 16px; border: 1px solid #E5E5E5; border-radius: 8px; background: white; font-size: 0.9rem; font-weight: 600; cursor: pointer; outline: none; appearance: none; -webkit-appearance: none; -moz-appearance: none; }
         .filter-select-box:focus { border-color: #6B8E4E; }
@@ -75,12 +77,13 @@
         .btn-green-add { background-color: #6B8E4E; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: background 0.2s; }
         .btn-green-add:hover { background-color: #55723e; }
 
-        /* TABEL PRODUK CRUD FUNGSI MONGODB DENGAN IKON OUTLINE POLOS */
+        /* TABEL PRODUK CRUD FUNGSI MONGODB ATLAS */
         .table-container-white { background: #FFFFFF; border: 1px solid #E5E5E5; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.01); width: 100%; }
         .crud-table { width: 100%; border-collapse: collapse; text-align: left; }
         .crud-table th { background: #F9FAF7; padding: 16px 20px; font-size: 0.85rem; font-weight: 800; color: #4A5C3A; text-transform: uppercase; border-bottom: 1px solid #E5E5E5; }
         .crud-table td { padding: 16px 20px; border-bottom: 1px solid #F5F5F5; font-size: 0.95rem; font-weight: 600; color: #333; vertical-align: middle; }
-        .table-thumb-img { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; background: #eee; }
+        .table-thumb-img { width: 64px; height: 64px; border-radius: 8px; object-fit: cover; background: #eee; }
+        .w-16 { width: 64px; } .h-16 { height: 64px; } .object-cover { object-fit: cover; } .rounded-lg { border-radius: 8px; }
         .badge-stock-green { background-color: #DEF7EC; color: #03543F; padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; display: inline-block; }
         .badge-stock-red { background-color: #FEE2E2; color: #9B1C1C; padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; display: inline-block; }
         
@@ -89,18 +92,33 @@
         .btn-icon-action:hover { border-color: #6B8E4E; background: #F9FAF7; color: #6B8E4E; }
         .btn-icon-action.delete:hover { border-color: #EF4444; background: #FEE2E2; color: #EF4444; }
 
-        /* MODAL POP-UP FORM TAMBAH/EDIT MONGODB COMPASS */
+        /* FORM MODAL POP-UP */
         .form-modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 500; }
         .form-modal-overlay.show { display: flex; }
         .form-modal-box { background: white; border-radius: 16px; padding: 35px; width: 100%; max-width: 500px; box-shadow: 0 15px 40px rgba(0,0,0,0.15); animation: popScale 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
         @keyframes popScale { from { transform: scale(0.8); opacity:0; } to { transform: scale(1); opacity:1; } }
         
-        .form-grid-inputs { display: flex; flex-direction: column; gap: 16px; margin-top: 20px; }
+        .form-grid-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 20px;
+            max-height: 55vh;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        .form-grid-inputs::-webkit-scrollbar {
+            width: 5px;
+        }
+        .form-grid-inputs::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 4px;
+        }
         .input-block-group { display: flex; flex-direction: column; gap: 6px; text-align: left; }
         .input-block-group label { font-size: 0.85rem; font-weight: 700; color: #111; }
         .input-block-group input, .input-block-group select, .input-block-group textarea { padding: 12px; border: 1px solid #E5E5E5; border-radius: 8px; font-size: 0.9rem; font-weight: 600; outline: none; width: 100%; }
         
-        /* MANDAT 4: VALIDASI INPUT ERROR KELAS BORDER MERAH PENYENGAT */
+        /* VALIDASI ERROR BORDER MERAH KETAT */
         .input-block-group.error-validate input, .input-block-group.error-validate select, .input-block-group.error-validate textarea { border-color: #EF4444 !important; background-color: #FFF5F5; }
         .error-message-text { color: #EF4444; font-size: 0.75rem; font-weight: 700; margin-top: 2px; display: none; text-align: left; }
         .input-block-group.error-validate .error-message-text { display: block; }
@@ -109,7 +127,7 @@
         .btn-modal-save { background: #283221; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 700; cursor: pointer; flex: 1; }
         .btn-modal-cancel { background: #F3F4F6; color: #4B5563; border: 1px solid #E5E7EB; padding: 12px 24px; border-radius: 8px; font-weight: 700; cursor: pointer; flex:1; }
 
-        /* POP-UP CONFIRMATION GLOBAL (MANDAT 4) */
+        /* CONFIRMATION POP-UP DIALOG */
         .confirm-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 600; opacity: 0; transition: opacity 0.3s; }
         .confirm-overlay.show { display: flex; opacity: 1; }
         .confirm-box { background: white; border-radius: 16px; padding: 35px; width: 100%; max-width: 420px; text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.15); animation: popScale 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
@@ -128,21 +146,32 @@
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
     
     <aside class="admin-sidebar-drawer" id="adminSidebar">
-        <div class="sidebar-brand-title">ANARCYXREPTILE <span style="font-size:0.75rem; color:#888; display:block; margin-top:4px; font-weight:600;">Admin Panel</span></div>
-        <nav class="sidebar-menu-ul">
-            <a href="{{ route('admin.dashboard') }}">
-                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z" /></svg> Dashboard Overview
-            </a>
-            <a href="#" class="active-menu">
-                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4L4 7m0 0v10l8 4" /></svg> Products
-            </a>
-            <a href="{{ route('admin.orders') }}">
-                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg> Order Management
-            </a>
-            <a href="{{ route('admin.education') }}">
-                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg> Education Management
-            </a>
-        </nav>
+        <div class="sidebar-inner-flex">
+            <div>
+                <div class="sidebar-brand-title">ANARCYXREPTILE <span style="font-size:0.75rem; color:#888; display:block; margin-top:4px; font-weight:600;">Admin Panel</span></div>
+                <nav class="sidebar-menu-ul">
+                    <a href="{{ route('admin.dashboard') }}">
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z" /></svg> Dashboard
+                    </a>
+                    <a href="#" class="active-menu">
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4L4 7m0 0v10l8 4" /></svg> Product
+                    </a>
+                    <a href="{{ route('admin.orders') }}">
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg> Order
+                    </a>
+                    <a href="{{ route('admin.education') }}">
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg> Education
+                    </a>
+                </nav>
+            </div>
+            <form action="{{ route('admin.logout') }}" method="POST" class="sidebar-logout-form">
+                @csrf
+                <button type="submit" class="sidebar-logout-btn">
+                    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                    Log Out
+                </button>
+            </form>
+        </div>
     </aside>
 
     <div class="admin-navbar">
@@ -156,7 +185,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                 </svg>
                 @if($unreadNotificationCount > 0)
-                    <span class="bell-badge-red">{{ $unreadNotificationCount }}</span>
+                    <span class="bell-badge-red"></span>
                 @endif
             </div>
 
@@ -172,7 +201,7 @@
                         <div class="noti-dropdown-item" style="color: #888;">Tidak ada notifikasi baru.</div>
                     @endforelse
                 </div>
-                <a href="{{ route('admin.notifications') }}" class="btn-read-more-noti">Read More Notification</a>
+                <a href="{{ route('admin.orders') }}" class="btn-read-more-noti">Read More Notification</a>
             </div>
 
             <div class="admin-profile-wrapper">
@@ -180,7 +209,6 @@
                 <div class="profile-img-circle"></div>
             </div>
 
-            <button class="btn-logout-red" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Log Out</button>
             <form id="logout-form" action="{{ route('admin.logout') }}" method="POST" style="display: none;">@csrf</form>
         </div>
     </div>
@@ -192,8 +220,8 @@
         <section class="product-stats-grid">
             <div class="stat-card-box"><div class="stat-card-title">Total Products</div><div class="stat-card-number">{{ $totalQty }}</div></div>
             <div class="stat-card-box"><div class="stat-card-title">In Stock</div><div class="stat-card-number" style="color: #6B8E4E;">{{ $inStockQty }}</div></div>
-            <div class="stat-card-box"><div class="stat-card-title">Out of Stock</div><div class="stat-card-number" style="color: #EF4444;">{{ $outStockQty }}</div></div>
-            <div class="stat-card-box"><div class="stat-card-title">Total Value</div><div class="stat-card-number" style="font-size: 1.4rem; padding-top: 4px;">Rp {{ number_format($totalValue, 0, ',', '.') }}</div></div>
+            <div class="stat-card-box"><div class="stat-card-title">Out Stock</div><div class="stat-card-number" style="color: #EF4444;">{{ $outStockQty }}</div></div>
+            <div class="stat-card-box"><div class="stat-card-title">Total Value Asset</div><div class="stat-card-number" style="font-size: 1.4rem; padding-top: 4px;">Rp {{ number_format($totalValue, 0, ',', '.') }}</div></div>
         </section>
 
         <section class="toolbar-flex-control">
@@ -224,9 +252,10 @@
             <table class="crud-table">
                 <thead>
                     <tr>
-                        <th style="width: 320px;">Products</th>
-                        <th>Category</th>
-                        <th>Price</th>
+                        <th style="width: 80px;">Foto Produk</th>
+                        <th>Nama</th>
+                        <th>Kategori</th>
+                        <th>Harga</th>
                         <th>Status</th>
                         <th style="text-align: center;">Actions</th>
                     </tr>
@@ -235,28 +264,38 @@
                     @forelse($products as $p)
                     <tr>
                         <td>
-                            <div style="display: flex; align-items: center; gap: 14px;">
-                                <img src="{{ asset('images/products/'.$p->image) }}" class="table-thumb-img" alt="">
-                                <div>
-                                    <div style="font-weight: 800; color: #111;">{{ $p->name }}</div>
-                                    <div style="font-size: 0.78rem; color: #888; font-style: italic;">{{ $p->attributes['morph'] ?? 'Normal Morph' }}</div>
+                            @if(!empty($p->image) && $p->image !== 'default.jpg')
+                                <img src="{{ asset('images/products/'.$p->image) }}" class="table-thumb-img w-16 h-16 object-cover rounded-lg" alt="{{ $p->name }}">
+                            @else
+                                <div class="table-thumb-img w-16 h-16 object-cover rounded-lg" style="display: flex; align-items: center; justify-content: center; background: #e5e7eb; color: #9ca3af;">
+                                    <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                                 </div>
-                            </div>
+                            @endif
+                        </td>
+                        <td>
+                            <div style="font-weight: 800; color: #111;">{{ $p->name }}</div>
+                            <div style="font-size: 0.8rem; color: #888; font-style: italic;">{{ $p->attributes['morph'] ?? 'Normal Morph' }}</div>
                         </td>
                         <td>{{ $p->category }}</td>
                         <td style="font-weight: 800; color: #283221;">Rp {{ number_format($p->price, 0, ',', '.') }}</td>
                         <td>
                             @if($p->stock > 0)
-                                <span class="badge-stock-green">in-stock</span>
+                                <span class="badge-stock-green">in-stock ({{ $p->stock }})</span>
                             @else
                                 <span class="badge-stock-red">out-stock</span>
                             @endif
                         </td>
                         <td>
                             <div class="action-buttons-flex" style="justify-content: center;">
-                                <button class="btn-icon-action" onclick="openEditModal('{{ $p->id }}', '{{ $p->name }}', '{{ $p->category }}', '{{ $p->price }}', '{{ $p->stock }}', '{{ $p->desc }}')">
+                                @php
+                                    // Kita amankan data morph ke variabel bersih sebelum masuk ke atribut JavaScript
+                                    $currentMorph = $p->attributes['morph'] ?? 'Normal Morph';
+                                @endphp
+                                
+                                <button class="btn-icon-action" onclick="openEditModal('{{ $p->id }}', '{{ $p->name }}', '{{ $p->category }}', '{{ $p->price }}', '{{ $p->stock }}', '{{ $p->desc }}', '{{ $currentMorph }}', '{{ $p->image }}')">
                                     <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                                 </button>
+                                
                                 <button class="btn-icon-action delete" onclick="triggerDeleteProduct('{{ $p->id }}')">
                                     <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-16v1M4 7h16" /></svg>
                                 </button>
@@ -265,7 +304,7 @@
                         </td>
                     </tr>
                     @empty
-                    <tr><td colspan="5" style="text-align: center; color: #888; padding: 40px 0;">Tidak ada produk reptil di database MongoDB Compass.</td></tr>
+                    <tr><td colspan="6" style="text-align: center; color: #888; padding: 40px 0;">Tidak ada produk reptil di database MongoDB Cloud Atlas.</td></tr>
                     @endforelse
                 </tbody>
             </table>
@@ -286,7 +325,7 @@
                     <div class="input-block-group" id="group-category">
                         <label>Category</label>
                         <div class="select-wrapper-relative">
-                            <select name="category" id="input-category" class="filter-select-box" style="padding: 12px 16px;">
+                            <select name="category" id="input-category" class="filter-select-box" style="padding: 12px 16px; width: 100%;">
                                 <option value="">Choose Category</option>
                                 <option value="Iguana">Iguana</option>
                                 <option value="Gecko">Gecko</option>
@@ -296,6 +335,10 @@
                             <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
                         </div>
                         <span class="error-message-text">Silakan pilih kategori!</span>
+                    </div>
+                    <div class="input-block-group" id="group-morph">
+                        <label>Morph Variant</label>
+                        <input type="text" name="morph" id="input-morph" placeholder="e.g. Albino Motley / Normal">
                     </div>
                     <div class="input-block-group" id="group-price">
                         <label>Price (IDR)</label>
@@ -313,7 +356,9 @@
                         <span class="error-message-text">Deskripsi produk wajib diisi!</span>
                     </div>
                     <div class="input-block-group" id="group-image">
-                        <label>Upload Image File</label>
+                        <label>Current Image</label>
+                        <img id="imagePreview" src="" alt="Preview" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 1px solid #E5E5E5; display: none;">
+                        <label style="margin-top: 10px;">Upload New Image</label>
                         <input type="file" name="image" id="input-image">
                         <span class="error-message-text">File foto produk wajib dilampirkan!</span>
                     </div>
@@ -345,9 +390,30 @@
         let deleteTargetFormId = null;
 
         function toggleSidebar() {
-            document.getElementById('adminSidebar').classList.toggle('open');
-            document.getElementById('sidebarOverlay').classList.toggle('show');
+            var sidebar = document.getElementById('adminSidebar');
+            var overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('show');
+            localStorage.setItem('sidebarStatus', sidebar.classList.contains('open') ? 'open' : 'closed');
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (localStorage.getItem('sidebarStatus') === 'open') {
+                document.getElementById('adminSidebar').classList.add('open');
+                document.getElementById('sidebarOverlay').classList.add('show');
+            }
+        });
+
+        document.addEventListener('click', function(event) {
+            var sidebar = document.getElementById('adminSidebar');
+            if (sidebar.classList.contains('open')) {
+                if (!sidebar.contains(event.target) && !event.target.closest('.btn-hamburger')) {
+                    sidebar.classList.remove('open');
+                    document.getElementById('sidebarOverlay').classList.remove('show');
+                    localStorage.setItem('sidebarStatus', 'closed');
+                }
+            }
+        });
 
         function toggleNotiPanel(event) {
             event.stopPropagation();
@@ -371,15 +437,17 @@
             
             document.getElementById('input-name').value = "";
             document.getElementById('input-category').value = "";
+            document.getElementById('input-morph').value = "Normal morph";
             document.getElementById('input-price').value = "";
             document.getElementById('input-stock').value = "";
             document.getElementById('input-desc').value = "";
             document.getElementById('input-image').value = "";
+            document.getElementById('imagePreview').style.display = 'none';
             
             document.getElementById('productFormModal').classList.add('show');
         }
 
-        function openEditModal(id, name, category, price, stock, desc) {
+        function openEditModal(id, name, category, price, stock, desc, morph, image) {
             isEditMode = true;
             document.getElementById('modalTitle').innerText = "Edit Product Unit";
             document.getElementById('mainCrudForm').action = "/admin/products/update/" + id;
@@ -387,9 +455,18 @@
 
             document.getElementById('input-name').value = name;
             document.getElementById('input-category').value = category;
+            document.getElementById('input-morph').value = morph;
             document.getElementById('input-price').value = price;
             document.getElementById('input-stock').value = stock;
             document.getElementById('input-desc').value = desc;
+
+            var preview = document.getElementById('imagePreview');
+            if (image && image !== 'default.jpg') {
+                preview.src = "{{ asset('images/products/') }}/" + image;
+                preview.style.display = 'block';
+            } else {
+                preview.style.display = 'none';
+            }
             
             document.getElementById('productFormModal').classList.add('show');
         }
@@ -476,7 +553,7 @@
 
         document.addEventListener("DOMContentLoaded", () => {
             let flashSuccessMessage = "{{ session('flash_success') }}";
-            let flashErrorMessage = "{{ session('flash_error') }}";
+            let flashErrorMessage = "{{ session('flash_error'); }}";
 
             if (flashSuccessMessage && flashSuccessMessage.trim() !== "") {
                 const iconBox = document.getElementById('feedbackIconBox');

@@ -2,14 +2,13 @@
 
 namespace App\Models;
 
-// 1. Pastikan pakai Authenticatable khusus MongoDB!
+// Menggunakan Authenticatable khusus driver MongoDB Laravel
 use MongoDB\Laravel\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class User extends Authenticatable
 {
-    use Notifiable, HasFactory;
+    use Notifiable;
 
     protected $connection = 'mongodb';
     protected $collection = 'users';
@@ -17,10 +16,11 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
-        'password',
-        'role', // Tambahan buat bedain 'admin' (Sultan) dan 'customer'
+        'username',
         'phone_number',
-        'address'
+        'password',
+        'role',
+        'address',
     ];
 
     protected $hidden = [
@@ -28,8 +28,12 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-        'password' => 'hashed',
-    ];
+    // Otomatis melakukan enkripsi password saat pengisian data baru ke Atlas
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
 }

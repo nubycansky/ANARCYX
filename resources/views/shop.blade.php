@@ -3,6 +3,20 @@
 @section('title', 'Shop - AnarcyxReptile')
 
 @push('styles')
+<style>
+    .custom-toast {
+        position: fixed; bottom: 20px; right: 20px;
+        background-color: #283221; color: white;
+        padding: 14px 24px; border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        display: flex; align-items: center; gap: 10px;
+        font-weight: 600; font-size: 0.9rem; z-index: 9999;
+        transform: translateY(100px); opacity: 0;
+        transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    }
+    .custom-toast.show { transform: translateY(0); opacity: 1; }
+    .toast-icon { color: #81c784; font-size: 1.2rem; }
+</style>
 @endpush
 
 @section('content')
@@ -13,6 +27,7 @@
             <button class="btn-search-trigger" onclick="handleSearchLive()">Search</button>
         </div>
     </div>
+    <div id="mongodb-products-data" data-json="{{ $products->toJson() }}" style="display: none;"></div>
 
     <div class="shop-container">
         
@@ -81,15 +96,17 @@
     <script>
         const OWNER_PHONE = "6281234567890";
 
-        // Database Unit Reptil
-        const ALL_PRODUCTS = [
-            { id: "REP001", name: "Rhinoceros Iguana", sciname: "Cyclura cornuta", category: "Iguana", price: 350000, desc: "Karakter jinak khas badak, memiliki tanduk unik kecil di bagian hidung depan.", image: "https://images.unsplash.com/photo-1601758124510-52d02ddb7cbd?auto=format&fit=crop&q=80&w=400" },
-            { id: "REP002", name: "Leopard Gecko Hypo", sciname: "Eublepharis macularius", category: "Gecko", price: 650000, desc: "Sangat cocok untuk pemula, warna kuning cerah bersih minim bintik hitam.", image: "https://images.unsplash.com/photo-1504450758481-7338eba7524a?auto=format&fit=crop&q=80&w=400" },
-            { id: "REP003", name: "Ball Python Normal", sciname: "Python regius", category: "Snake", price: 1200000, desc: "Ular peliharaan paling tenang di dunia, bermotif eksotis alami.", image: "https://images.unsplash.com/photo-1531386151447-fd76ad50012f?auto=format&fit=crop&q=80&w=400" },
-            { id: "REP004", name: "Sulcata Tortoise Baby", sciname: "Centrochelys sulcata", category: "Tortoise", price: 2500000, desc: "Kura-kura darat raksasa gurun, aktif berjemur dan napsu makan rakus.", image: "https://images.unsplash.com/photo-1518467166778-b88f373ffec7?auto=format&fit=crop&q=80&w=400" },
-            { id: "REP005", name: "Green Iguana Premium", sciname: "Iguana iguana", category: "Iguana", price: 450000, desc: "Warna hijau daun pekat mengkilap, kondisi spike rapi tegak berdiri.", image: "https://images.unsplash.com/photo-1548247416-ec66f4900b2e?auto=format&fit=crop&q=80&w=400" },
-            { id: "REP006", name: "Corn Snake Amel", sciname: "Pantherophis guttatus", category: "Snake", price: 1800000, desc: "Warna merah jingga menyala tanpa pigmen hitam, lincah dan mulus.", image: "https://images.unsplash.com/photo-1629191122802-990ff5b09569?auto=format&fit=crop&q=80&w=400" }
-        ];
+        // Database Unit Reptil (dinamis dari MongoDB Atlas)
+        const dataElement = document.getElementById('mongodb-products-data');
+        const ALL_PRODUCTS = dataElement && dataElement.getAttribute('data-json')
+            ? JSON.parse(dataElement.getAttribute('data-json')).map(p => {
+                let productId = p.id || '';
+                if (p._id) {
+                    productId = typeof p._id === 'object' && p._id.$oid ? p._id.$oid : p._id.toString();
+                }
+                return { ...p, id: productId, sciname: p.sciname || 'Exotic Pet' };
+            })
+            : [];
 
         let activeCategory = null;
         let activePriceRange = null;
@@ -188,13 +205,13 @@
                             <svg width="18" height="18" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.5 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
                         </button>
                         <div class="product-img-wrapper">
-                            <img src="${product.image}" alt="${product.name}">
+                            <img src="${product.image.startsWith('http') ? product.image : '/images/products/' + product.image}" alt="${product.name}">
                         </div>
                         <div class="product-info">
-                            <span class="product-name">${product.name}</span>
+                            <a href="/products/${product.id}" class="product-name" style="text-decoration: none; color: #111111; font-weight: 800; cursor: pointer;">${product.name}</a>
                             <span class="product-price">Rp ${product.price.toLocaleString('id-ID')}</span>
                         </div>
-                        <div class="product-sciname">${product.sciname}</div>
+                            <div class="product-sciname">${product.sciname || 'Exotic Pet'}</div>
                         
                         <div class="badge-container">
                             <span class="badge">${product.category}</span>
@@ -212,59 +229,46 @@
             }).join('');
         }
 
-        // Fungsi Add to Cart - menyimpan data ke keranjang tanpa berpindah halaman
         function addToCart(productId) {
-            // 1. Cari data objek produk berdasarkan ID yang diklik
             const product = ALL_PRODUCTS.find(p => p.id === productId);
+            if (!product) return;
 
-            // 2. Ambil data keranjang lokal saat ini dari browser memory
             let localCart = localStorage.getItem('anarcyx_cart') ? JSON.parse(localStorage.getItem('anarcyx_cart')) : [];
-
-            // 3. Cek apakah produk ini sudah pernah dimasukkan sebelumnya
             const existingIndex = localCart.findIndex(item => item.id === productId);
 
             if (existingIndex > -1) {
-                // Jika sudah ada, cukup tambahkan jumlah unitnya (kuantitas)
                 localCart[existingIndex].qty += 1;
             } else {
-                // Jika belum ada, suntikkan data unit baru ke dalam array
                 localCart.push({
                     id: product.id,
                     name: product.name,
-                    sciname: product.sciname,
-                    price: product.price,
+                    price: parseFloat(product.price),
                     qty: 1,
                     image: product.image
                 });
             }
 
-            // 4. Kunci dan simpan kembali state array terbaru ke localStorage permanen
             localStorage.setItem('anarcyx_cart', JSON.stringify(localCart));
 
-            // 5. Perbarui angka badge counter di navbar atas secara real-time
-            updateCartBadge();
+            // Perbarui Counter Navbar
+            const totalQty = localCart.reduce((acc, item) => acc + item.qty, 0);
+            const cartBadge = document.getElementById('cartCount') || document.querySelector('.cart-count');
+            if (cartBadge) cartBadge.innerText = totalQty;
 
-            // 6. Beri feedback singkat kepada user tanpa berpindah halaman
-            showAddToCartFeedback(product.name);
+            // Munculkan Notifikasi Berhasil
+            showToast(`"${product.name}" berhasil dimasukkan ke keranjang belanja!`);
         }
 
-        // Feedback visual toast mini setelah Add to Cart berhasil
-        function showAddToCartFeedback(productName) {
-            const existing = document.getElementById('cartFeedbackToast');
-            if (existing) existing.remove();
-
+        function showToast(message) {
             const toast = document.createElement('div');
-            toast.id = 'cartFeedbackToast';
-            toast.innerText = `"${productName}" ditambahkan ke keranjang`;
-            toast.style.cssText = 'position:fixed;bottom:30px;right:30px;background:#283221;color:#fff;padding:14px 22px;border-radius:10px;font-weight:600;font-size:0.9rem;z-index:9999;box-shadow:0 8px 20px rgba(0,0,0,0.15);opacity:0;transition:opacity 0.25s ease;';
+            toast.className = 'custom-toast';
+            toast.innerHTML = `<span class="toast-icon">✓</span> <span>${message}</span>`;
             document.body.appendChild(toast);
-
-            requestAnimationFrame(() => { toast.style.opacity = '1'; });
-
+            setTimeout(() => toast.classList.add('show'), 100);
             setTimeout(() => {
-                toast.style.opacity = '0';
-                setTimeout(() => toast.remove(), 300);
-            }, 2200);
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 400);
+            }, 3000);
         }
 
         function quickOrder(name, price) {
@@ -274,7 +278,21 @@
         }
 
         document.addEventListener("DOMContentLoaded", () => {
-            renderProducts(ALL_PRODUCTS);
+            const urlParams = new URLSearchParams(window.location.search);
+            const categoryParam = urlParams.get('category');
+
+            if (categoryParam) {
+                activeCategory = categoryParam;
+
+                const targetBox = document.querySelector(`.filter-box-item[data-value="${categoryParam}"]`);
+                if (targetBox) {
+                    targetBox.classList.add('active');
+                }
+
+                applyFilters();
+            } else {
+                renderProducts(ALL_PRODUCTS);
+            }
         });
 
         function toggleFilter() {

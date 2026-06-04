@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\EducationArticle;
 use App\Models\Reptile;
 use Illuminate\Http\Request;
 
@@ -20,9 +21,9 @@ class HomeController extends Controller
 
     public function shop()
     {
-        $reptiles = Reptile::all();
+        $products = Reptile::all();
         $categories = Reptile::pluck('category')->unique()->filter();
-        return view('shop', compact('reptiles', 'categories'));
+        return view('shop', compact('products', 'categories'));
     }
 
     public function detail($id)
@@ -32,8 +33,32 @@ class HomeController extends Controller
         return view('detail', compact('reptile'));
     }
 
-    public function education()
+    // 2. REVISI UTAMA: AMBIL DATA NYATA ARTIKEL DARI MONGODB ATLAS
+    public function education(Request $request)
     {
-        return view('education');
+        $query = EducationArticle::query();
+
+        // Jika customer melakukan pencarian artikel
+        if ($request->filled('search')) {
+            $query->where('title', 'like', '%' . $request->search . '%');
+        }
+
+        // Jika customer memfilter berdasarkan kategori edukasi (General/Diet/Habitat)
+        if ($request->filled('category') && $request->category !== 'all') {
+            $query->where('category', $request->category);
+        }
+
+        $articles = $query->orderBy('created_at', 'desc')->get();
+        
+        // Ambil list kategori artikel unik untuk bahan menu filter di view
+        $articleCategories = EducationArticle::pluck('category')->unique()->filter();
+
+        return view('education', compact('articles', 'articleCategories'));
+    }
+
+    public function showArticle($id)
+    {
+        $article = EducationArticle::findOrFail($id);
+        return view('education_show', compact('article'));
     }
 }

@@ -4,7 +4,6 @@
 
 @push('styles')
     <style>
-        /* --- PERBAIKAN VISUAL MINIMALIS: CART KOSONG SESUAI REVISI FIGMA --- */
         .cart-empty-wrapper {
             display: flex;
             flex-direction: column;
@@ -13,39 +12,40 @@
             text-align: center;
             padding: 100px 20px;
             width: 100%;
-            min-height: 55vh; /* Membuat konten otomatis berada pas di tengah-tengah layar */
+            min-height: 55vh;
         }
-
-        /* Desain Ikon Keranjang Tipis (Outline Abu-abu) */
-        .cart-empty-icon-box {
-            color: #A3A3A3; /* Abu-abu tipis elegan */
-            margin-bottom: 20px;
+        .cart-empty-icon-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: #d4edda;
             display: flex;
             justify-content: center;
             align-items: center;
+            margin-bottom: 24px;
         }
-
-        .cart-empty-icon-box svg {
-            width: 80px;
-            height: 80px;
-            stroke-width: 1.2; /* Ketebalan garis tipis sesuai figma baru */
+        .cart-empty-icon-circle svg {
+            width: 48px;
+            height: 48px;
+            color: #155724;
         }
-
-        /* Teks Pemberitahuan "Your cart is empty" */
         .cart-empty-headline {
             font-size: 1.6rem;
             font-weight: 700;
             color: #111111;
-            margin-bottom: 30px;
+            margin-bottom: 8px;
             letter-spacing: -0.3px;
         }
-
-        /* Tombol "Shop Now" Kaku Persegi Premium */
-        .btn-cart-empty-shop {
-            background-color: #283221; /* Hijau bumi gelap solid */
+        .cart-empty-subtitle {
+            font-size: 0.95rem;
+            color: #6c757d;
+            margin-bottom: 30px;
+        }
+        .btn-cart-empty-browse {
+            background-color: #283221;
             color: #FFFFFF;
             padding: 16px 50px;
-            border-radius: 6px; /* Sudut sedikit melengkung kaku profesional */
+            border-radius: 6px;
             text-decoration: none;
             font-weight: 700;
             font-size: 0.95rem;
@@ -53,11 +53,31 @@
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(40, 50, 33, 0.15);
         }
-
-        .btn-cart-empty-shop:hover {
+        .btn-cart-empty-browse:hover {
             background-color: #3b4930;
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(40, 50, 33, 0.25);
+        }
+        .cart-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn-clear-all {
+            background-color: rgba(220, 38, 38, 0.1);
+            border: none;
+            color: #dc2626;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-clear-all:hover {
+            background-color: #dc2626;
+            color: #ffffff;
+            transform: translateY(-1px);
         }
     </style>
 @endpush
@@ -68,9 +88,7 @@
         <div class="cart-page-wrapper" id="mainCartPageLayout">
             
             <section class="cart-items-side" id="cartItemsSection">
-                <h2 class="cart-title">Your Order Cart</h2>
-                <div id="cartItemsContainer">
-                    </div>
+                    <div id="cartItemsContainer"></div>
             </section>
 
             <section class="cart-summary-side" id="cartSummarySection">
@@ -126,9 +144,8 @@
         const OWNER_PHONE = "6281234567890";
         const SHIPPING_COST = 20000;
 
-        // localCart sudah di-deklarasikan global di navbar-scripts.blade.php
-        // Sinkronkan ulang dengan localStorage untuk memastikan data terbaru (misal setelah Add to Cart)
-        localCart = localStorage.getItem('anarcyx_cart') 
+        // Sinkronkan data keranjang dari localStorage
+        let localCart = localStorage.getItem('anarcyx_cart') 
             ? JSON.parse(localStorage.getItem('anarcyx_cart')) 
             : [];
 
@@ -138,33 +155,77 @@
         function renderCart() {
             localStorage.setItem('anarcyx_cart', JSON.stringify(localCart));
 
-            const mainLayout = document.getElementById('mainCartPageLayout');
-            const itemsContainer = document.getElementById('cartItemsContainer');
-            const summarySection = document.getElementById('cartSummarySection');
-            const totalBadge = document.getElementById('cartCount');
-            
             const totalQty = localCart.reduce((acc, item) => acc + item.qty, 0);
-            totalBadge.innerText = totalQty;
+            const totalBadge = document.getElementById('cartCount') || document.querySelector('.cart-count');
+            if (totalBadge) totalBadge.innerText = totalQty;
 
-            // JIKA KERANJANG KOSONG -> RENDER DESAIN MINIMALIS BARU (GAMBAR REVISI)
+            const mainLayout = document.getElementById('mainCartPageLayout');
+            if (!mainLayout) return;
+
+            // 1. JIKA KERANJANG KOSONG -> TAMPILKAN DESAIN REVISI KOSONG
             if (localCart.length === 0) {
-                mainLayout.className = ""; // Copot grid 2 kolom
+                mainLayout.className = "";
                 mainLayout.innerHTML = `
                     <div class="cart-empty-wrapper">
-                        <div class="cart-empty-icon-box">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <div class="cart-empty-icon-circle">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H3.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 014.513 7.5h14.974c.577 0 1.058.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
                             </svg>
                         </div>
-                        <h2 class="cart-empty-headline">Your cart is empty</h2>
-                        <a href="{{ route('shop') }}" class="btn-cart-empty-shop">Shop Now</a>
+                        <h2 class="cart-empty-headline">Your Cart is Empty</h2>
+                        <p class="cart-empty-subtitle">Add some animal to your cart to get started</p>
+                        <a href="/shop" class="btn-cart-empty-browse">Browse Animal</a>
                     </div>
                 `;
                 return;
             }
 
-            // JIKA KERANJANG BERISI ITEM
-            let htmlContent = '';
+            // 2. JIKA KERANJANG ADA ISINYA -> CETAK STRUKTUR HALAMAN UTAMANYA
+            mainLayout.className = "cart-page-wrapper";
+            mainLayout.innerHTML = `
+                <section class="cart-items-side" id="cartItemsSection">
+                    <div id="cartItemsContainer"></div>
+                </section>
+
+                <section class="cart-summary-side" id="cartSummarySection">
+                    <div class="cart-summary-block">
+                        <h3 class="cart-summary-title">Summary</h3>
+                        <div class="cart-subtotal-row">
+                            <span>Subtotal</span>
+                            <span id="summarySubtotal">Rp 0</span>
+                        </div>
+                        <div class="cart-subtotal-row">
+                            <span>Biaya Pengiriman</span>
+                            <span id="summaryShipping">Rp 20.000</span>
+                        </div>
+                        
+                        <div class="cart-coupon-flex">
+                            <input type="text" class="cart-coupon-input" placeholder="Kode Kupon / Voucher">
+                            <button class="btn-coupon-apply">Apply</button>
+                        </div>
+                        
+                        <div class="cart-subtotal-row total">
+                            <span>Total Keseluruhan</span>
+                            <span id="summaryTotal">Rp 0</span>
+                        </div>
+                        
+                        <button class="btn-main" style="width: 100%; padding: 15px; margin-top: 25px;" onclick="checkoutWhatsApp()">
+                            Checkout to WhatsApp &rarr;
+                        </button>
+                    </div>
+                </section>
+            `;
+
+            // 3. SEKARANG AMBIL ELEMEN WADAH YANG BARU DICETAK DI ATAS UNTUK LOOPING ITEM
+            const itemsContainer = document.getElementById('cartItemsContainer');
+            if (!itemsContainer) return;
+
+            let htmlContent = `
+                    <div class="cart-header-row" style="margin-bottom: 25px;">
+                    <h2 class="cart-title" style="margin:0;">Your Order Cart</h2>
+                    <button class="btn-clear-all" onclick="clearAllCart()">Hapus Semua Produk</button>
+                </div>
+            `;
             let subtotal = 0;
 
             localCart.forEach((item, index) => {
@@ -173,25 +234,31 @@
 
                 htmlContent += `
                     <div class="cart-item-card">
-                        <img src="${item.image}" class="cart-item-img" alt="${item.name}">
+                        <img src="${item.image.startsWith('http') ? item.image : '/images/products/' + item.image}" class="cart-item-img" alt="${item.name}">
                         <div class="cart-item-info-block">
                             <span class="cart-item-name">${item.name}</span>
-                            <span class="cart-item-id">Species: ${item.sciname}</span>
+                            <span class="cart-item-id">Species: ${item.sciname || 'Exotic Pet'}</span>
                         </div>
                         <div class="cart-quantity-block">
                             <button onclick="updateQty(${index}, -1)">-</button>
                             <span>${item.qty}</span>
                             <button onclick="updateQty(${index}, 1)">+</button>
                         </div>
-                        <div class="cart-item-price-block">Rp ${(itemTotal).toLocaleString('id-ID')}</div>
+                        <div class="cart-item-price-block">Rp ${itemTotal.toLocaleString('id-ID')}</div>
                         <button class="cart-remove-btn" onclick="removeItem(${index})">&times;</button>
                     </div>
                 `;
             });
 
+            // Suntikkan list htmlContent baru ke dalam wadah item container
             itemsContainer.innerHTML = htmlContent;
-            document.getElementById('summarySubtotal').innerText = `Rp ${subtotal.toLocaleString('id-ID')}`;
-            document.getElementById('summaryTotal').innerText = `Rp ${(subtotal + SHIPPING_COST).toLocaleString('id-ID')}`;
+
+            // Perbarui teks harga ringkasan nota belanjaan
+            const subtotalElement = document.getElementById('summarySubtotal');
+            const totalElement = document.getElementById('summaryTotal');
+            
+            if (subtotalElement) subtotalElement.innerText = `Rp ${subtotal.toLocaleString('id-ID')}`;
+            if (totalElement) totalElement.innerText = `Rp ${(subtotal + SHIPPING_COST).toLocaleString('id-ID')}`;
         }
 
         function updateQty(index, change) {
@@ -234,6 +301,26 @@
                             `Mohon dibantu infokan langkah pembayarannya. Terima kasih!`;
 
             window.open(`https://wa.me/${OWNER_PHONE}?text=${encodeURIComponent(message)}`, '_blank');
+        }
+
+        function clearAllCart() {
+            const overlay = document.getElementById('deleteConfirmOverlay');
+            if (overlay) {
+                overlay.classList.add('show');
+
+                const titleText = overlay.querySelector('.confirm-title-text');
+                if (titleText) titleText.innerText = "Apakah yakin ingin mengosongkan seluruh keranjang belanjamu?";
+
+                const btnYes = document.getElementById('btnConfirmDeleteYes');
+                if (btnYes) {
+                    btnYes.onclick = function() {
+                        localStorage.removeItem('anarcyx_cart');
+                        localCart = [];
+                        closeDeleteModal();
+                        renderCart();
+                    };
+                }
+            }
         }
 
         document.addEventListener("DOMContentLoaded", renderCart);

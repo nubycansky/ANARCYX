@@ -14,7 +14,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/shop', [HomeController::class, 'shop'])->name('shop');
 Route::get('/education', [HomeController::class, 'education'])->name('education');
-Route::get('/product/{id}', [HomeController::class, 'detail'])->name('product.detail');
+Route::get('/education/{id}', [HomeController::class, 'showArticle'])->name('education.show');
+Route::get('/products/{id}', [HomeController::class, 'detail'])->name('products.show');
 Route::get('/cart', function () {
     return view('cart');
 })->name('cart');
@@ -167,6 +168,8 @@ Route::post('/admin/logout', [AdminController::class, 'handleLogout'])->name('ad
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
     Route::get('/notifications', [AdminController::class, 'showAllNotifications'])->name('notifications');
+    Route::delete('/notifications/clear', [AdminController::class, 'clearNotifications'])->name('notifications.clear');
+    Route::delete('/notifications/destroy/{id}', [AdminController::class, 'destroyNotification'])->name('notifications.destroy');
     
     // Rute CRUD Product Management
     Route::get('/products', [AdminController::class, 'showProducts'])->name('products');

@@ -25,40 +25,22 @@ class AdminController extends Controller
     }
 
     public function handleLogin(Request $request) {
-        $credentials = $request->validate([
+        $request->validate([
             'username' => 'required|string',
             'password' => 'required|string',
         ]);
 
-        $identifier = $credentials['username'];
-
-        $user = User::where('email', $identifier)
-                    ->orWhere('name', $identifier)
-                    ->first();
-
-        if (!$user) {
-            return back()
-                ->withErrors(['login_error' => 'Username tidak terdaftar di sistem admin.'])
-                ->withInput();
+        if (Auth::attempt(['email' => $request->username, 'password' => $request->password])) {
+            $user = Auth::user();
+            if ($user->role !== 'admin') {
+                Auth::logout();
+                return back()->withErrors(['login_error' => 'Username atau password salah'])->withInput();
+            }
+            $request->session()->regenerate();
+            return redirect()->route('admin.dashboard')->with('flash_success', 'Selamat datang kembali, ' . $user->name . '!');
         }
 
-        if ($user->role !== 'admin') {
-            return back()
-                ->withErrors(['login_error' => 'Akun ini bukan akun administrator.'])
-                ->withInput();
-        }
-
-        if (!Hash::check($credentials['password'], $user->password)) {
-            return back()
-                ->withErrors(['login_error' => 'Password yang kamu masukkan salah.'])
-                ->withInput();
-        }
-
-        Auth::login($user, $request->boolean('remember'));
-        $request->session()->regenerate();
-
-        return redirect()->route('admin.dashboard')
-            ->with('flash_success', 'Selamat datang kembali, ' . $user->name . '!');
+        return back()->withErrors(['login_error' => 'Username atau password salah'])->withInput();
     }
 
     public function handleLogout(Request $request) {
@@ -80,11 +62,18 @@ class AdminController extends Controller
         $totalOrders = Order::count() ?: 0;
         $totalProducts = Reptile::count() ?: 0;
         $newCustomers = User::where('role', 'customer')->count() ?: 0;
+        $inStockQty = Reptile::where('stock', '>', 0)->count();
+        $outStockQty = Reptile::where('stock', '<=', 0)->count();
+
+        $totalValueAsset = 0;
+        foreach (Reptile::all() as $rep) {
+            $totalValueAsset += ((int)$rep->price * (int)$rep->stock);
+        }
 
         $dropdownNotifications = Notification::orderBy('created_at', 'desc')->take(5)->get();
         $unreadNotificationCount = Notification::where('is_read', false)->count();
 
-        // HITUNG SALES COUNT PER PRODUK DARI ORDER ITEMS (MongoDB embedded)
+        // SALES COUNT PER PRODUCT DARI ORDER ITEMS (MongoDB embedded)
         $salesByProduct = [];
         foreach (Order::all() as $order) {
             $items = $order->items ?? [];
@@ -96,7 +85,7 @@ class AdminController extends Controller
             }
         }
 
-        // AMBIL TOP 5 PRODUK BERDASARKAN SALES (fallback ke stock kalau belum ada sales)
+        // TOP 5 PRODUCTS BASED ON SALES
         $topProducts = Reptile::all()
             ->sortByDesc(function ($prod) use ($salesByProduct) {
                 return $salesByProduct[(string)$prod->_id] ?? (int)$prod->stock;
@@ -110,16 +99,17 @@ class AdminController extends Controller
 
         $recentOrders = Order::orderBy('_id', 'desc')->take(5)->get();
 
-        // DATA KATEGORI UNTUK PIE CHART
-        $categoryData = [
-            Reptile::where('category', 'Snake')->count(),
-            Reptile::where('category', 'Iguana')->count(),
-            Reptile::where('category', 'Gecko')->count(),
-            Reptile::where('category', 'Tortoise')->count()
-        ];
+        // CATEGORY DATA — "kadal" maps to Gecko
+        $snakeCount = Reptile::where('category', 'Snake')->count();
+        $iguanaCount = Reptile::where('category', 'Iguana')->count();
+        $geckoCount = Reptile::where('category', 'Gecko')->count()
+                    + Reptile::where('category', 'kadal')->count();
+        $tortoiseCount = Reptile::where('category', 'Tortoise')->count();
+        $categoryData = [$snakeCount, $iguanaCount, $geckoCount, $tortoiseCount];
 
         return view('admin.dashboard', compact(
-            'totalRevenue', 'totalOrders', 'totalProducts', 'newCustomers', 
+            'totalRevenue', 'totalOrders', 'totalProducts', 'newCustomers',
+            'inStockQty', 'outStockQty', 'totalValueAsset',
             'dropdownNotifications', 'unreadNotificationCount', 'topProducts', 'recentOrders',
             'categoryData'
         ));
@@ -203,7 +193,8 @@ class AdminController extends Controller
             'category' => 'required',
             'price' => 'required|numeric',
             'stock' => 'required|numeric',
-            'desc' => 'required'
+            'desc' => 'required',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
         $product = Reptile::find($id);
@@ -223,6 +214,15 @@ class AdminController extends Controller
         }
 
         $product->save();
+
+        if ($product->stock <= 3) {
+            \App\Models\Notification::create([
+                'type' => 'system_stock',
+                'message' => '⚠️ Stok unit reptile "' . $product->name . '" tersisa ' . $product->stock . ' ekor!',
+                'created_at' => now()
+            ]);
+        }
+
         return redirect()->route('admin.products')->with('flash_success', 'Perubahan Data Berhasil Disimpan!');
     }
 
@@ -253,6 +253,22 @@ class AdminController extends Controller
             }
         }
         return view('admin.notifications', compact('recentNotifications', 'lastWeekNotifications'));
+    }
+
+    public function clearNotifications()
+    {
+        \App\Models\Notification::truncate();
+
+        return redirect()->back()->with('flash_success', 'Seluruh riwayat notifikasi berhasil dibersihkan!');
+    }
+
+    public function destroyNotification($id)
+    {
+        $notification = \App\Models\Notification::find($id);
+        if ($notification) {
+            $notification->delete();
+        }
+        return redirect()->back()->with('flash_success', 'Notifikasi berhasil dihapus.');
     }
 
     // ==========================================
@@ -306,8 +322,26 @@ class AdminController extends Controller
 
         $order = Order::find($id);
         if ($order) {
+            $oldStatus = $order->status;
             $order->status = $request->status;
             $order->save();
+
+            if ($request->status === 'confirmed' && $oldStatus !== 'confirmed') {
+                \App\Models\Notification::create([
+                    'type' => 'order',
+                    'message' => '🛒 Pesanan baru masuk #' . ($order->order_id_string ?? '#ORD-'.$id) . ' dari ' . $order->customer_name,
+                    'created_at' => now()
+                ]);
+            }
+
+            if ($request->status === 'delivered' && $oldStatus !== 'delivered') {
+                \App\Models\Notification::create([
+                    'type' => 'invoice',
+                    'message' => '💳 Pembayaran Invoice #' . ($order->order_id_string ?? '#ORD-'.$id) . ' terverifikasi valid oleh sistem.',
+                    'created_at' => now()
+                ]);
+            }
+
             return redirect()->route('admin.orders')
                 ->with('flash_success', 'Status pesanan ' . ($order->order_id_string ?? '#ORD-'.$id) . ' diperbarui menjadi ' . ucfirst($request->status) . '.');
         }
@@ -369,9 +403,23 @@ class AdminController extends Controller
             'category' => 'required|in:General,Habitat,Diet,Health',
             'preview'  => 'required|string|max:255',
             'content'  => 'required|string',
+            'image'    => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        EducationArticle::create($data);
+        $article = new EducationArticle();
+        $article->title = $request->title;
+        $article->category = $request->category;
+        $article->preview = $request->preview;
+        $article->content = $request->content;
+
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('images/education'), $filename);
+            $article->image = $filename;
+        }
+
+        $article->save();
 
         return redirect()->route('admin.education')
             ->with('flash_success', 'Artikel edukasi "' . $data['title'] . '" berhasil ditambahkan.');
@@ -379,15 +427,36 @@ class AdminController extends Controller
 
     public function updateArticle(Request $request, $id) {
         $data = $request->validate([
-            'title'    => 'required|string|max:200',
-            'category' => 'required|in:General,Habitat,Diet,Health',
-            'preview'  => 'required|string|max:255',
-            'content'  => 'required|string',
+            'title'       => 'required|string|max:200',
+            'category'    => 'required|in:General,Habitat,Diet,Health',
+            'preview'     => 'required|string|max:255',
+            'content'     => 'required|string',
+            'image'       => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'delete_image' => 'nullable|in:0,1',
         ]);
 
         $article = EducationArticle::find($id);
         if ($article) {
-            $article->update($data);
+            $article->title = $request->title;
+            $article->category = $request->category;
+            $article->preview = $request->preview;
+            $article->content = $request->content;
+
+            if ($request->delete_image == "1") {
+                if (!empty($article->image) && file_exists(public_path('images/education/' . $article->image))) {
+                    @unlink(public_path('images/education/' . $article->image));
+                }
+                $article->image = null;
+            }
+
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $file->move(public_path('images/education'), $filename);
+                $article->image = $filename;
+            }
+
+            $article->save();
             return redirect()->route('admin.education')
                 ->with('flash_success', 'Artikel "' . $data['title'] . '" berhasil diperbarui.');
         }

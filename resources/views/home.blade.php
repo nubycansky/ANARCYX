@@ -58,7 +58,7 @@
                         <img src="{{ $rep->image ? asset('images/products/' . $rep->image) : 'https://images.unsplash.com/photo-1601758124510-52d02ddb7cbd?auto=format&fit=crop&q=80&w=500' }}" alt="{{ $rep->name }}" loading="lazy">
                     </div>
                     <div class="product-info">
-                        <span class="product-name">{{ $rep->name }}</span>
+                        <a href="/products/{{ $rep->id }}" class="product-name" style="text-decoration: none; color: inherit; font-weight: 800; cursor: pointer;">{{ $rep->name }}</a>
                         <span class="product-price">Rp.{{ number_format($rep->price, 0, ',', '.') }}</span>
                     </div>
                     <div class="product-sciname">{{ $rep->attributes['morph'] ?? 'Exotic Species' }}</div>
@@ -68,7 +68,7 @@
                     </div>
 
                     <div class="card-actions">
-                        <a href="{{ route('product.detail', $rep->id) }}" class="btn-action btn-add-cart" style="text-decoration:none;">
+                        <a href="{{ route('products.show', $rep->id) }}" class="btn-action btn-add-cart" style="text-decoration:none;">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
                             Add to Cart
                         </a>
