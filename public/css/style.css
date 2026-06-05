@@ -1006,3 +1006,17 @@ footer {
     .btn-search-trigger { padding: 14px; width: 100%; }
 }
 
+/* --- TOAST NOTIFICATION GLOBAL --- */
+.custom-toast {
+    position: fixed; bottom: 20px; right: 20px;
+    background-color: #283221; color: white;
+    padding: 14px 24px; border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    display: flex; align-items: center; gap: 10px;
+    font-weight: 600; font-size: 0.9rem; z-index: 9999;
+    transform: translateY(100px); opacity: 0;
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+.custom-toast.show { transform: translateY(0); opacity: 1; }
+.toast-icon { color: #81c784; font-size: 1.2rem; }
+

@@ -103,6 +103,17 @@
 
         .flash-success-banner { background: #DEF7EC; color: #03543F; border: 1px solid #BBE5C5; padding: 12px 18px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; margin-bottom: 20px; }
         .flash-error-banner { background: #FEE2E2; color: #9B1C1C; border: 1px solid #FCA5A5; padding: 12px 18px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; margin-bottom: 20px; }
+
+        .order-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 999; }
+        .order-modal-overlay.show { display: flex; }
+        .order-modal-box { background: white; border-radius: 16px; padding: 30px; width: 100%; max-width: 600px; box-shadow: 0 15px 40px rgba(0,0,0,0.15); animation: popScale 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); max-height: 85vh; overflow-y: auto; }
+        .detail-grid-info { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; text-align: left; }
+        .detail-info-block { display: flex; flex-direction: column; gap: 4px; }
+        .detail-info-block label { font-size: 0.8rem; font-weight: 700; color: #888; text-transform: uppercase; }
+        .detail-info-block span { font-size: 0.95rem; font-weight: 600; color: #111; }
+        .order-items-list { border: 1px solid #E5E5E5; border-radius: 8px; margin-bottom: 20px; overflow: hidden; }
+        .order-item-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid #F5F5F5; font-size: 0.9rem; font-weight: 600; }
+        .order-item-row:last-child { border-bottom: none; }
     </style>
 </head>
 <body>
@@ -239,18 +250,34 @@
                         <td><span class="badge-status {{ $order->status }}">{{ ucfirst($order->status) }}</span></td>
                         <td>
                             <div class="action-buttons-flex">
-                                <form action="{{ route('admin.orders.updateStatus', $order->_id) }}" method="POST" class="status-action-form">
-                                    @csrf
-                                    <select name="status">
-                                        <option value="pending"   {{ $order->status == 'pending'   ? 'selected' : '' }}>Pending</option>
-                                        <option value="confirmed" {{ $order->status == 'confirmed' ? 'selected' : '' }}>Confirmed</option>
-                                        <option value="delivered" {{ $order->status == 'delivered' ? 'selected' : '' }}>Delivered</option>
-                                        <option value="cancelled" {{ $order->status == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
-                                    </select>
-                                    <button type="submit" class="btn-icon-action" title="Update Status">
-                                        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
-                                    </button>
-                                </form>
+                                @if($order->status === 'pending')
+                                    <button type="button" onclick="openAdminActionModal('terima', '{{ route('admin.orders.approve', $order->_id) }}')" style="cursor: pointer; background: #6B8E4E; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 0.8rem;">Terima & Proses</button>
+                                    <button type="button" onclick="event.preventDefault(); openAdminActionModal('tolak', '{{ route('admin.orders.reject', $order->_id) }}')" style="cursor: pointer; background: #991b1b; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 0.8rem; margin-left: 5px; transition: background 0.2s;" onmouseover="this.style.background='#7f1d1d'" onmouseout="this.style.background='#991b1b'">Tolak</button>
+                                @else
+                                    <form action="{{ route('admin.orders.updateStatus', $order->_id) }}" method="POST" class="status-action-form">
+                                        @csrf
+                                        <select name="status">
+                                            <option value="pending"   {{ $order->status == 'pending'   ? 'selected' : '' }}>Pending</option>
+                                            <option value="confirmed" {{ $order->status == 'confirmed' ? 'selected' : '' }}>Confirmed</option>
+                                            <option value="delivered" {{ $order->status == 'delivered' ? 'selected' : '' }}>Delivered</option>
+                                            <option value="cancelled" {{ $order->status == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                                        </select>
+                                        <button type="submit" class="btn-icon-action" title="Update Status">
+                                            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                                        </button>
+                                    </form>
+                                @endif
+                                <button type="button" class="btn-icon-action" onclick='openOrderDetailModal(@json($order))' title="Lihat Detail Pesanan">
+                                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                </button>
+                                <a href="{{ route('admin.orders.invoice', $order->_id) }}" class="btn-icon-action" title="Download Invoice PDF" target="_blank">
+                                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                </a>
                                 <button class="btn-icon-action delete" onclick="triggerDeleteOrder('{{ $order->_id }}', '{{ $order->display_id }}')" title="Delete Order">
                                     <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3" /></svg>
                                 </button>
@@ -282,8 +309,86 @@
         </div>
     </div>
 
+    <!-- Modal Detail Pesanan -->
+    <div class="order-modal-overlay" id="orderDetailModal">
+        <div class="order-modal-box">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #F5F5F5; padding-bottom: 12px;">
+                <h3 style="font-size: 1.2rem; font-weight: 800; color: #111; margin: 0;">Rincian Pesanan <span id="lbl-order-number" style="color: #6B8E4E;"></span></h3>
+                <button type="button" style="background: none; border: none; font-size: 1.5rem; color: #aaa; cursor: pointer;" onclick="closeOrderModal()">&times;</button>
+            </div>
+            <div class="detail-grid-info">
+                <div class="detail-info-block"><label>Nama Pembeli</label><span id="lbl-customer-name"></span></div>
+                <div class="detail-info-block"><label>WhatsApp</label><span id="lbl-customer-phone"></span></div>
+                <div class="detail-info-block" style="grid-column: span 2;"><label>Alamat Lengkap</label><span id="lbl-customer-address"></span></div>
+                <div class="detail-info-block"><label>Status</label><span id="lbl-payment-status"></span></div>
+                <div class="detail-info-block"><label>Waktu Transaksi</label><span id="lbl-order-date"></span></div>
+            </div>
+            <h4 style="font-size: 0.85rem; font-weight: 800; color: #4A5C3A; text-align: left; text-transform: uppercase; margin-bottom: 10px;">Daftar Item Reptil / Produk:</h4>
+            <div class="order-items-list" id="lbl-order-items-container"></div>
+            <div style="display: flex; justify-content: space-between; align-items: center; background: #F9FAF7; padding: 14px 20px; border-radius: 8px; font-weight: 800; font-size: 1.05rem; color: #111; margin-bottom: 0;">
+                <span>Total Belanja:</span><span id="lbl-total-price" style="color: #283221;"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Action Modal -->
+    <div id="adminActionModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); backdrop-filter: blur(4px); align-items: center; justify-content: center;">
+        <div style="background: #1A2315; border: 2px solid #6B8E4E; border-radius: 16px; padding: 30px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); font-family: sans-serif;">
+            
+            <div id="modalIconContainer" style="margin-bottom: 15px;"></div>
+            
+            <h3 id="modalTitle" style="color: #FFFFFF; font-size: 1.25rem; margin: 0 0 10px 0; font-weight: 800;"></h3>
+            <p id="modalDescription" style="color: #BBE5C5; font-size: 0.9rem; line-height: 1.5; margin: 0 0 25px 0;"></p>
+            
+            <form id="modalActionForm" method="POST" style="margin: 0;">
+                @csrf
+                <div style="display: flex; gap: 12px; justify-content: center;">
+                    <button type="button" onclick="closeAdminActionModal()" style="flex: 1; background: transparent; color: #BBE5C5; border: 1px solid rgba(255,255,255,0.2); padding: 10px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; cursor: pointer;">Batal</button>
+                    <button type="submit" id="modalSubmitBtn" style="flex: 1; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; cursor: pointer;"></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         let deleteOrderTargetFormId = null;
+
+        function openAdminActionModal(type, actionUrl) {
+            const modal = document.getElementById('adminActionModal');
+            const form = document.getElementById('modalActionForm');
+            const iconContainer = document.getElementById('modalIconContainer');
+            const title = document.getElementById('modalTitle');
+            const description = document.getElementById('modalDescription');
+            const submitBtn = document.getElementById('modalSubmitBtn');
+            
+            form.action = actionUrl;
+            modal.style.display = 'flex';
+            
+            if (type === 'terima') {
+                title.innerText = 'Terima Pesanan?';
+                description.innerText = 'Pesanan akan dikonfirmasi dan statusnya akan berubah menjadi sedang diproses.';
+                submitBtn.innerText = 'Ya, Proses';
+                submitBtn.style.background = '#6B8E4E';
+                iconContainer.innerHTML = `
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#6B8E4E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block;">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>`;
+            } else {
+                title.innerText = 'Tolak Pesanan?';
+                description.innerText = 'Apakah Anda yakin ingin membatalkan dan menolak transaksi pesanan pelanggan ini?';
+                submitBtn.innerText = 'Ya, Tolak';
+                submitBtn.style.background = '#991b1b';
+                iconContainer.innerHTML = `
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#991b1b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block;">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="15" y1="9" x2="9" y2="15"></line>
+                    </svg>`;
+            }
+        }
+        
+        function closeAdminActionModal() {
+            document.getElementById('adminActionModal').style.display = 'none';
+        }
 
         function toggleSidebar() {
             var sidebar = document.getElementById('adminSidebar');
@@ -345,6 +450,49 @@
 
         function closeFeedbackAlert() {
             document.getElementById('feedbackPopupOverlay').classList.remove('show');
+        }
+
+        function openOrderDetailModal(order) {
+            const orderNum = order.order_number || (order.id ? order.id : (order._id ? order._id.substring(0, 8) : '0000'));
+            document.getElementById('lbl-order-number').innerText = "#" + orderNum;
+            document.getElementById('lbl-customer-name').innerText = order.customer_name || '';
+            document.getElementById('lbl-customer-phone').innerText = order.customer_phone || '-';
+            document.getElementById('lbl-customer-address').innerText = order.customer_address || '-';
+            document.getElementById('lbl-payment-status').innerText = (order.status || 'pending').toUpperCase();
+
+            let dateObj = new Date(order.created_at);
+            document.getElementById('lbl-order-date').innerText = order.created_at ? dateObj.toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute:'2-digit'}) : '-';
+
+            let formatter = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 });
+            document.getElementById('lbl-total-price').innerText = formatter.format(order.total_price);
+
+            let itemsContainer = document.getElementById('lbl-order-items-container');
+            itemsContainer.innerHTML = "";
+
+            if (order.items && order.items.length > 0) {
+                order.items.forEach(item => {
+                    let row = document.createElement('div');
+                    row.className = "order-item-row";
+                    let productName = item.product_name || item.name || 'Produk';
+                    let price = item.price || 0;
+                    let qty = item.qty || 1;
+                    row.innerHTML = `
+                        <div style="text-align: left;">
+                            <div style="color: #111; font-weight: 700;">${productName}</div>
+                            <div style="font-size: 0.75rem; color: #888;">${qty} unit &times; ${formatter.format(price)}</div>
+                        </div>
+                        <div style="color: #283221; font-weight: 700;">${formatter.format(qty * price)}</div>
+                    `;
+                    itemsContainer.appendChild(row);
+                });
+            } else {
+                itemsContainer.innerHTML = `<div style="padding: 15px; color: #888; font-style: italic;">Tidak ada rincian item barang.</div>`;
+            }
+            document.getElementById('orderDetailModal').classList.add('show');
+        }
+
+        function closeOrderModal() {
+            document.getElementById('orderDetailModal').classList.remove('show');
         }
 
         document.addEventListener("DOMContentLoaded", () => {

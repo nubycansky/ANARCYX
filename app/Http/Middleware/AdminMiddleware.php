@@ -11,13 +11,13 @@ class AdminMiddleware
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (!Auth::check()) {
+        if (!Auth::guard('admin')->check()) {
             return redirect()->route('admin.login')
                 ->withErrors(['login_error' => 'Silakan login untuk mengakses panel admin.']);
         }
 
-        if (Auth::user()->role !== 'admin') {
-            Auth::logout();
+        if (Auth::guard('admin')->user()->role !== 'admin') {
+            Auth::guard('admin')->logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
             return redirect()->route('admin.login')

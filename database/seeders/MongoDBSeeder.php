@@ -23,7 +23,7 @@ class MongoDBSeeder extends Seeder
             'email' => 'admin', // Ini yang dipakai untuk input "Username" di form login
             'password' => Hash::make('admin123'), // Ini password-nya
             'role' => 'admin',
-            'phone_number' => '6281234567890',
+            'phone_number' => '62895613369443',
             'address' => 'Jakarta, Indonesia'
         ]);
 

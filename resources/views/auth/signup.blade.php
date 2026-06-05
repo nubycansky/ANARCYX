@@ -269,7 +269,7 @@
             </form>
 
             <p class="auth-footer-text">
-                Already have an account? <a href="{{ route('auth.login') }}">Sign In</a>
+                Already have an account? <a href="{{ route('login') }}">Sign In</a>
             </p>
         </div>
     </div>

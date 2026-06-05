@@ -410,7 +410,7 @@
         <section class="cta-consultation-banner">
             <h2 class="cta-banner-title">Butuh saran / konsultasi lebih lanjut?</h2>
             <p class="cta-banner-desc">Tim ahli AnarcyxReptile siap membantu menjawab kendala teknis perawatan, pemilihan asupan gizi, hingga setup kandang terbaik bagi reptil kesayanganmu.</p>
-            <a href="https://wa.me/6281234567890?text=Halo%20AnarcyxReptile,%20saya%20butuh%20konsultasi%20mengenai%20perawatan%20reptil" target="_blank" class="btn-cta-whatsapp">
+            <a href="https://wa.me/62895613369443?text=Halo%20AnarcyxReptile,%20saya%20butuh%20konsultasi%20mengenai%20perawatan%20reptil" target="_blank" class="btn-cta-whatsapp">
                 <svg viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.513 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.713-1.457L0 24zm6.135-3.414l.354.21c1.614.957 3.477 1.463 5.39 1.464 5.568 0 10.1-4.529 10.104-10.097.002-2.698-1.045-5.234-2.95-7.14C17.135 3.117 14.6 2.07 11.9 2.07 6.42 2.07 1.957 6.53 1.954 12.099c-.001 1.95.511 3.854 1.481 5.514l.23.393-1.01 3.693 3.791-.994z"/></svg>
                 Hubungi kami
             </a>

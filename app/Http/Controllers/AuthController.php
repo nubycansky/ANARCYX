@@ -10,14 +10,14 @@ use App\Models\User;
 class AuthController extends Controller
 {
     public function showLogin() {
-        if (Auth::check() && Auth::user()->role !== 'admin') {
+        if (Auth::guard('web')->check() && Auth::guard('web')->user()->role !== 'admin') {
             return redirect()->route('home');
         }
         return view('auth.login');
     }
 
     public function showSignup() {
-        if (Auth::check() && Auth::user()->role !== 'admin') {
+        if (Auth::guard('web')->check() && Auth::guard('web')->user()->role !== 'admin') {
             return redirect()->route('home');
         }
         return view('auth.signup');
@@ -43,7 +43,7 @@ class AuthController extends Controller
             return back()->withErrors(['password' => 'Password yang kamu masukkan salah.'])->withInput();
         }
 
-        Auth::login($user, $request->boolean('remember'));
+        Auth::guard('web')->login($user, $request->boolean('remember'));
         $request->session()->regenerate();
 
         return redirect()->route('home')->with('flash_success', 'Selamat datang kembali, ' . $user->name . '!');
@@ -66,14 +66,14 @@ class AuthController extends Controller
             'address'      => '',
         ]);
 
-        Auth::login($user);
+        Auth::guard('web')->login($user);
         $request->session()->regenerate();
 
         return redirect()->route('home')->with('flash_success', 'Akun berhasil dibuat. Selamat bergabung, ' . $user->name . '!');
     }
 
     public function handleLogout(Request $request) {
-        Auth::logout();
+        Auth::guard('web')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         return redirect()->route('home')->with('flash_success', 'Kamu telah keluar dari akun.');

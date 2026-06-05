@@ -10,6 +10,7 @@ use App\Models\Reptile;
 use App\Models\Order;
 use App\Models\Notification;
 use App\Models\EducationArticle;
+use App\Models\Invoice;
 use Carbon\Carbon;
 
 class AdminController extends Controller
@@ -18,7 +19,7 @@ class AdminController extends Controller
     // 0. ADMIN AUTH (LOGIN & LOGOUT)
     // ==========================================
     public function showLogin() {
-        if (Auth::check() && Auth::user()->role === 'admin') {
+        if (Auth::guard('admin')->check() && Auth::guard('admin')->user()->role === 'admin') {
             return redirect()->route('admin.dashboard');
         }
         return view('admin.login');
@@ -30,10 +31,12 @@ class AdminController extends Controller
             'password' => 'required|string',
         ]);
 
-        if (Auth::attempt(['email' => $request->username, 'password' => $request->password])) {
-            $user = Auth::user();
+        $credentials = ['email' => $request->username, 'password' => $request->password];
+
+        if (Auth::guard('admin')->attempt($credentials)) {
+            $user = Auth::guard('admin')->user();
             if ($user->role !== 'admin') {
-                Auth::logout();
+                Auth::guard('admin')->logout();
                 return back()->withErrors(['login_error' => 'Username atau password salah'])->withInput();
             }
             $request->session()->regenerate();
@@ -44,7 +47,7 @@ class AdminController extends Controller
     }
 
     public function handleLogout(Request $request) {
-        Auth::logout();
+        Auth::guard('admin')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         return redirect()->route('admin.login')
@@ -99,6 +102,9 @@ class AdminController extends Controller
 
         $recentOrders = Order::orderBy('_id', 'desc')->take(5)->get();
 
+        // PENDING ORDERS (menunggu konfirmasi)
+        $pendingOrders = Order::where('status', 'pending')->orderBy('created_at', 'desc')->get();
+
         // CATEGORY DATA — "kadal" maps to Gecko
         $snakeCount = Reptile::where('category', 'Snake')->count();
         $iguanaCount = Reptile::where('category', 'Iguana')->count();
@@ -111,7 +117,7 @@ class AdminController extends Controller
             'totalRevenue', 'totalOrders', 'totalProducts', 'newCustomers',
             'inStockQty', 'outStockQty', 'totalValueAsset',
             'dropdownNotifications', 'unreadNotificationCount', 'topProducts', 'recentOrders',
-            'categoryData'
+            'pendingOrders', 'categoryData'
         ));
     }
 
@@ -276,6 +282,7 @@ class AdminController extends Controller
     // ==========================================
     public function showOrders(Request $request) {
         $query = Order::query();
+        $query->where('status', '!=', 'pending');
 
         if ($request->filled('search')) {
             $term = $request->search;
@@ -289,7 +296,7 @@ class AdminController extends Controller
             $query->where('status', $request->status);
         }
 
-        $orders = $query->orderBy('_id', 'desc')->get()->map(function ($order) {
+        $orders = $query->orderBy('created_at', 'desc')->get()->map(function ($order) {
             $items = $order->items ?? [];
             $order->item_count = array_sum(array_map(fn($i) => (int)($i['qty'] ?? 0), $items));
             $order->display_id = $order->order_id_string ?? ('#ORD-' . substr((string)$order->_id, -5));
@@ -323,10 +330,47 @@ class AdminController extends Controller
         $order = Order::find($id);
         if ($order) {
             $oldStatus = $order->status;
-            $order->status = $request->status;
+            $newStatus = $request->status;
+            $order->status = $newStatus;
             $order->save();
 
-            if ($request->status === 'confirmed' && $oldStatus !== 'confirmed') {
+            if ($newStatus === 'cancelled' && $oldStatus !== 'cancelled') {
+                if (!empty($order->items) && count($order->items) > 0) {
+                    foreach ($order->items as $item) {
+                        $productId = $item['product_id'] ?? $item['id'] ?? null;
+                        if ($productId) {
+                            $product = \App\Models\Reptile::find($productId);
+                            if ($product) {
+                                $product->increment('stock', intval($item['qty']));
+                            }
+                        }
+                    }
+                }
+            }
+
+            if ($oldStatus === 'cancelled' && $newStatus !== 'cancelled') {
+                if (!empty($order->items) && count($order->items) > 0) {
+                    foreach ($order->items as $item) {
+                        $productId = $item['product_id'] ?? $item['id'] ?? null;
+                        if ($productId) {
+                            $product = \App\Models\Reptile::find($productId);
+                            if ($product) {
+                                $product->decrement('stock', intval($item['qty']));
+                            }
+                        }
+                    }
+                }
+            }
+
+            if ($newStatus === 'confirmed' && $oldStatus !== 'confirmed') {
+                \App\Models\Invoice::create([
+                    'order_id' => $id,
+                    'order_id_string' => $order->order_id_string ?? '#ORD-' . $id,
+                    'customer_name' => $order->customer_name,
+                    'total_price' => $order->total_price,
+                    'payment_status' => 'pending',
+                ]);
+
                 \App\Models\Notification::create([
                     'type' => 'order',
                     'message' => '🛒 Pesanan baru masuk #' . ($order->order_id_string ?? '#ORD-'.$id) . ' dari ' . $order->customer_name,
@@ -334,7 +378,7 @@ class AdminController extends Controller
                 ]);
             }
 
-            if ($request->status === 'delivered' && $oldStatus !== 'delivered') {
+            if ($newStatus === 'delivered' && $oldStatus !== 'delivered') {
                 \App\Models\Notification::create([
                     'type' => 'invoice',
                     'message' => '💳 Pembayaran Invoice #' . ($order->order_id_string ?? '#ORD-'.$id) . ' terverifikasi valid oleh sistem.',
@@ -344,6 +388,31 @@ class AdminController extends Controller
 
             return redirect()->route('admin.orders')
                 ->with('flash_success', 'Status pesanan ' . ($order->order_id_string ?? '#ORD-'.$id) . ' diperbarui menjadi ' . ucfirst($request->status) . '.');
+        }
+        return redirect()->route('admin.orders')
+            ->with('flash_error', 'Pesanan tidak ditemukan.');
+    }
+
+    public function approve($id) {
+        $order = Order::find($id);
+        if ($order) {
+            $request = new Request(['status' => 'confirmed']);
+            return app()->call('App\Http\Controllers\AdminController@updateOrderStatus', [
+                'request' => $request,
+                'id' => $id
+            ]);
+        }
+        return redirect()->route('admin.orders')
+            ->with('flash_error', 'Pesanan tidak ditemukan.');
+    }
+
+    public function reject($id) {
+        $order = Order::find($id);
+        if ($order) {
+            $label = $order->order_id_string ?? ('#ORD-'.$id);
+            $order->delete();
+            return redirect()->back()
+                ->with('flash_success', 'Pesanan ' . $label . ' telah ditolak dan dihapus dari sistem.');
         }
         return redirect()->route('admin.orders')
             ->with('flash_error', 'Pesanan tidak ditemukan.');
@@ -462,6 +531,17 @@ class AdminController extends Controller
         }
         return redirect()->route('admin.education')
             ->with('flash_error', 'Artikel tidak ditemukan.');
+    }
+
+    public function generateInvoicePdf($id) {
+        $order = \App\Models\Order::find($id);
+        if (!$order) {
+            return redirect()->route('admin.orders')
+                ->with('flash_error', 'Pesanan tidak ditemukan.');
+        }
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.invoice_pdf', compact('order'));
+        $filename = 'invoice-' . ($order->order_id_string ?? substr($order->_id, 0, 8)) . '.pdf';
+        return $pdf->download($filename);
     }
 
     public function deleteArticle($id) {

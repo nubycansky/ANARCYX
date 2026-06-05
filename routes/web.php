@@ -16,12 +16,23 @@ Route::get('/shop', [HomeController::class, 'shop'])->name('shop');
 Route::get('/education', [HomeController::class, 'education'])->name('education');
 Route::get('/education/{id}', [HomeController::class, 'showArticle'])->name('education.show');
 Route::get('/products/{id}', [HomeController::class, 'detail'])->name('products.show');
+Route::post('/products/{id}/review', [HomeController::class, 'storeReview'])->name('products.review');
 Route::get('/cart', function () {
     return view('cart');
 })->name('cart');
 
+Route::view('/wishlist', 'wishlist')->name('wishlist');
+Route::post('/checkout', [HomeController::class, 'submitOrder'])->name('checkout.submit');
+Route::view('/order-success', 'order-success')->name('order.success');
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/profile', [App\Http\Controllers\UserController::class, 'profile'])->name('user.profile');
+    Route::post('/profile/update', [App\Http\Controllers\UserController::class, 'updateProfile'])->name('user.profile.update');
+    Route::post('/profile/change-password', [App\Http\Controllers\UserController::class, 'changePassword'])->name('user.profile.password');
+});
+
 // Public user authentication (customer login & signup)
-Route::get('/login', [AuthController::class, 'showLogin'])->name('auth.login');
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'handleLogin'])->name('auth.handleLogin');
 Route::get('/signup', [AuthController::class, 'showSignup'])->name('auth.signup');
 Route::post('/signup', [AuthController::class, 'handleSignup'])->name('auth.handleSignup');
@@ -43,7 +54,7 @@ Route::get('/seed/{key}', function ($key) {
         'email' => 'admin',
         'password' => Hash::make('admin123'),
         'role' => 'admin',
-        'phone_number' => '6281234567890',
+        'phone_number' => '62895613369443',
         'address' => 'Jakarta, Indonesia'
     ]);
 
@@ -165,7 +176,7 @@ Route::get('/admin/login', [AdminController::class, 'showLogin'])->name('admin.l
 Route::post('/admin/login', [AdminController::class, 'handleLogin'])->name('admin.handleLogin');
 Route::post('/admin/logout', [AdminController::class, 'handleLogout'])->name('admin.logout');
 
-Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
     Route::get('/notifications', [AdminController::class, 'showAllNotifications'])->name('notifications');
     Route::delete('/notifications/clear', [AdminController::class, 'clearNotifications'])->name('notifications.clear');
@@ -180,7 +191,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Rute Order Management
     Route::get('/orders', [AdminController::class, 'showOrders'])->name('orders');
     Route::post('/orders/update-status/{id}', [AdminController::class, 'updateOrderStatus'])->name('orders.updateStatus');
+    Route::post('/orders/approve/{id}', [AdminController::class, 'approve'])->name('orders.approve');
+    Route::post('/orders/reject/{id}', [AdminController::class, 'reject'])->name('orders.reject');
     Route::delete('/orders/delete/{id}', [AdminController::class, 'deleteOrder'])->name('orders.delete');
+    Route::get('/orders/invoice/{id}', [AdminController::class, 'generateInvoicePdf'])->name('orders.invoice');
 
     // Rute Education Management
     Route::get('/education', [AdminController::class, 'showEducation'])->name('education');

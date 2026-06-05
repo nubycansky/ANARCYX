@@ -214,6 +214,34 @@
             </div>
         </section>
 
+        <div style="background: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 30px; border-left: 6px solid #6B8E4E;">
+            <h3 style="margin: 0 0 5px 0; font-size: 1.2rem; font-weight: 800; color: #111;">🔔 Antrean Konfirmasi Pesanan Baru</h3>
+            <p style="margin: 0 0 20px 0; font-size: 0.85rem; color: #666; font-weight: 600;">Mohon periksa ketersediaan stok produk sebelum menerima pesanan dari pengguna.</p>
+
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                @forelse($pendingOrders as $order)
+                    <div style="display: flex; justify-content: space-between; align-items: center; background: #F9FAF7; border: 1px solid #E5E5E5; padding: 16px 20px; border-radius: 12px;">
+                        <div style="text-align: left;">
+                            <div style="font-weight: 800; color: #283221; font-size: 0.95rem;">#{{ $order->order_number ?? substr($order->_id, 0, 8) }} - {{ $order->customer_name }}</div>
+                            <div style="font-size: 0.8rem; color: #666; font-weight: 600; margin-top: 2px;">
+                                Total: <span style="color: #111; font-weight: 700;">Rp{{ number_format($order->total_price, 0, ',', '.') }}</span> | WhatsApp: {{ $order->customer_phone ?? '-' }}
+                            </div>
+                        </div>
+
+                        <!-- Tombol Aksi Cepat Terima / Tolak -->
+                        <div style="display: flex; gap: 8px;">
+                            <button type="button" onclick="openAdminActionModal('terima', '{{ route('admin.orders.approve', $order->_id) }}')" style="background: #DEF7EC; color: #03543F; border: 1px solid #BBE5C5; padding: 8px 16px; border-radius: 8px; font-weight: 800; font-size: 0.8rem; cursor: pointer;">Terima & Proses</button>
+                            <button type="button" onclick="openAdminActionModal('tolak', '{{ route('admin.orders.reject', $order->_id) }}')" style="background: #FEE2E2; color: #9B1C1C; border: 1px solid #FCA5A5; padding: 8px 16px; border-radius: 8px; font-weight: 800; font-size: 0.8rem; cursor: pointer; margin-left: 5px;">Tolak</button>
+                        </div>
+                    </div>
+                @empty
+                    <div style="padding: 20px; color: #888; font-style: italic; text-align: center; background: #FAFAFA; border-radius: 12px; border: 1px solid #EEEEEE;">
+                        ✨ Semua pesanan baru telah dikonfirmasi. Antrean kosong!
+                    </div>
+                @endforelse
+            </div>
+        </div>
+
         <section class="chart-grid-2">
             <div class="chart-card">
                 <div class="chart-card-title">Revenue Overview <span style="font-weight:500; color:#888; font-size:0.85rem;">— Monthly revenue and orders</span></div>
@@ -374,6 +402,71 @@
                 }
             }
         });
+    </script>
+
+    <!-- Admin Action Modal -->
+    <div id="adminActionModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); backdrop-filter: blur(4px); align-items: center; justify-content: center;">
+        <div style="background: #1A2315; border: 2px solid #6B8E4E; border-radius: 16px; padding: 30px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); font-family: sans-serif;">
+            
+            <div id="modalIconContainer" style="margin-bottom: 15px;"></div>
+            
+            <h3 id="modalTitle" style="color: #FFFFFF; font-size: 1.25rem; margin: 0 0 10px 0; font-weight: 800;"></h3>
+            <p id="modalDescription" style="color: #BBE5C5; font-size: 0.9rem; line-height: 1.5; margin: 0 0 25px 0;"></p>
+            
+            <form id="modalActionForm" method="POST" style="margin: 0;">
+                @csrf
+                <div style="display: flex; gap: 12px; justify-content: center;">
+                    <button type="button" onclick="closeAdminActionModal()" style="flex: 1; background: transparent; color: #BBE5C5; border: 1px solid rgba(255,255,255,0.2); padding: 10px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; cursor: pointer;">Batal</button>
+                    <button type="submit" id="modalSubmitBtn" style="flex: 1; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; cursor: pointer;"></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openAdminActionModal(type, actionUrl) {
+            const modal = document.getElementById('adminActionModal');
+            const form = document.getElementById('modalActionForm');
+            const iconContainer = document.getElementById('modalIconContainer');
+            const title = document.getElementById('modalTitle');
+            const description = document.getElementById('modalDescription');
+            const submitBtn = document.getElementById('modalSubmitBtn');
+            
+            form.action = actionUrl;
+            modal.style.display = 'flex';
+            
+            if (type === 'terima') {
+                title.innerText = 'Terima Pesanan?';
+                description.innerText = 'Pesanan akan dikonfirmasi dan statusnya akan masuk ke meja kerja Order Management.';
+                submitBtn.innerText = 'Ya, Terima';
+                submitBtn.style.background = '#6B8E4E';
+                iconContainer.innerHTML = `
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#6B8E4E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block;">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>`;
+            } else {
+                title.innerText = 'Tolak Pesanan?';
+                description.innerText = 'Apakah Anda yakin ingin membatalkan dan menolak transaksi pesanan pelanggan ini?';
+                submitBtn.innerText = 'Ya, Tolak';
+                submitBtn.style.background = '#991b1b';
+                iconContainer.innerHTML = `
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#991b1b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block;">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="15" y1="9" x2="9" y2="15"></line>
+                    </svg>`;
+            }
+        }
+        
+        function closeAdminActionModal() {
+            document.getElementById('adminActionModal').style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('adminActionModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
     </script>
 </body>
 </html>

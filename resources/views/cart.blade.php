@@ -84,6 +84,8 @@
 
 @section('content')
 
+    <div id="authStatusData" data-authenticated="{{ auth()->check() ? 'true' : 'false' }}" style="display: none;"></div>
+
     <main>
         <div class="cart-page-wrapper" id="mainCartPageLayout">
             
@@ -113,14 +115,39 @@
                         <span id="summaryTotal">Rp 0</span>
                     </div>
                     
-                    <button class="btn-main" style="width: 100%; padding: 15px; margin-top: 25px;" onclick="checkoutWhatsApp()">
-                        Checkout to WhatsApp &rarr;
-                    </button>
+                    @auth
+                        <button class="btn-main" style="width: 100%; padding: 15px; margin-top: 25px;" onclick="checkoutWhatsApp()">
+                            Checkout to WhatsApp &rarr;
+                        </button>
+                    @else
+                        <button type="button" class="btn-main" style="width: 100%; padding: 15px; margin-top: 25px;" onclick="showLoginModal()">
+                            Checkout to WhatsApp &rarr;
+                        </button>
+                    @endauth
                 </div>
             </section>
 
         </div>
     </main>
+
+    {{-- Login Confirmation Modal --}}
+    <div id="checkoutLoginModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.75); backdrop-filter: blur(4px); align-items: center; justify-content: center;">
+        <div style="background: #1A2315; border: 2px solid #6B8E4E; border-radius: 16px; padding: 30px; width: 90%; max-width: 420px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); font-family: sans-serif;">
+            <div style="margin-bottom: 15px;">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#6B8E4E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block;">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+            </div>
+            <h3 style="color: #FFFFFF; font-size: 1.25rem; margin: 0 0 10px 0; font-weight: 800;">Konfirmasi Login</h3>
+            <p style="color: #BBE5C5; font-size: 0.9rem; line-height: 1.5; margin: 0 0 25px 0;">Anda harus masuk ke akun Anda terlebih dahulu untuk melanjutkan proses transaksi dan mengamankan data pesanan.</p>
+            
+            <div style="display: flex; gap: 12px; justify-content: center;">
+                <button onclick="closeLoginModal()" style="flex: 1; background: transparent; color: #BBE5C5; border: 1px solid rgba(255,255,255,0.2); padding: 12px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;">Batal</button>
+                <a href="{{ route('login') }}" style="flex: 1; background: #6B8E4E; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; text-decoration: none; display: flex; align-items: center; justify-content: center; transition: all 0.2s;" onmouseover="this.style.background='#55723E'">Login Sekarang</a>
+            </div>
+        </div>
+    </div>
 
     <div class="confirm-overlay" id="deleteConfirmOverlay">
         <div class="confirm-box">
@@ -141,7 +168,7 @@
 
 @push('scripts')
     <script>
-        const OWNER_PHONE = "6281234567890";
+        const OWNER_PHONE = "62895613369443";
         const SHIPPING_COST = 20000;
 
         // Sinkronkan data keranjang dari localStorage
@@ -209,7 +236,7 @@
                             <span id="summaryTotal">Rp 0</span>
                         </div>
                         
-                        <button class="btn-main" style="width: 100%; padding: 15px; margin-top: 25px;" onclick="checkoutWhatsApp()">
+                        <button class="btn-main" style="width: 100%; padding: 15px; margin-top: 25px;" onclick="handleCheckout()">
                             Checkout to WhatsApp &rarr;
                         </button>
                     </div>
@@ -288,6 +315,33 @@
             }
         });
 
+        function handleCheckout() {
+            const authStatus = document.getElementById('authStatusData');
+            const isAuthenticated = authStatus && authStatus.getAttribute('data-authenticated') === 'true';
+            if (!isAuthenticated) {
+                showLoginModal();
+                return;
+            }
+            checkoutWhatsApp();
+        }
+
+        function showLoginModal() {
+            const modal = document.getElementById('checkoutLoginModal');
+            if (modal) modal.style.display = 'flex';
+        }
+
+        function closeLoginModal() {
+            const modal = document.getElementById('checkoutLoginModal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('checkoutLoginModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+
         function checkoutWhatsApp() {
             let listItemsText = localCart.map((item, idx) => 
                 `${idx + 1}. *${item.name}* (${item.qty} ekor) -> Rp ${(item.price * item.qty).toLocaleString('id-ID')}`
@@ -296,11 +350,41 @@
 
             const message = `Halo AnarcyxReptile, saya ingin memesan unit reptile berikut:\n\n` +
                             `${listItemsText}\n\n` +
-                            `• Ongkos Kirim: Rp ${SHIPPING_COST.toLocaleString('id-ID')}\n` +
-                            `• *Total Tagihan:* Rp ${totalAkhir.toLocaleString('id-ID')}\n\n` +
+                            `� Ongkos Kirim: Rp ${SHIPPING_COST.toLocaleString('id-ID')}\n` +
+                            `� *Total Tagihan:* Rp ${totalAkhir.toLocaleString('id-ID')}\n\n` +
                             `Mohon dibantu infokan langkah pembayarannya. Terima kasih!`;
 
-            window.open(`https://wa.me/${OWNER_PHONE}?text=${encodeURIComponent(message)}`, '_blank');
+            const payload = {
+                customer_name: localStorage.getItem('anarcyx_customer_name') || 'Guest User',
+                customer_phone: localStorage.getItem('anarcyx_customer_phone') || '',
+                customer_address: localStorage.getItem('anarcyx_customer_address') || '',
+                total_price: totalAkhir,
+                items: localCart.map(item => ({
+                    product_id: item.id,
+                    product_name: item.name,
+                    qty: item.qty,
+                    price: item.price
+                }))
+            };
+
+            fetch('{{ route("checkout.submit") }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                body: JSON.stringify(payload)
+            }).then(res => res.json()).then(data => {
+                if (data.success) {
+                    window.open(`https://wa.me/${OWNER_PHONE}?text=${encodeURIComponent(message)}`, '_blank');
+                    localStorage.removeItem('anarcyx_cart');
+                    localStorage.removeItem('anarcyx_customer_name');
+                    localStorage.removeItem('anarcyx_customer_phone');
+                    localStorage.removeItem('anarcyx_customer_address');
+                    window.location.href = '{{ route("order.success") }}';
+                }
+            }).catch(() => {
+                window.open(`https://wa.me/${OWNER_PHONE}?text=${encodeURIComponent(message)}`, '_blank');
+                localStorage.removeItem('anarcyx_cart');
+                window.location.href = '{{ route("order.success") }}';
+            });
         }
 
         function clearAllCart() {

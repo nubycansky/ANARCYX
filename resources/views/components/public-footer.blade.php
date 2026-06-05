@@ -21,7 +21,7 @@
         <div class="footer-contact">
             <h4>Contact</h4>
             <p>
-                WhatsApp: +62 812-3456-7890<br>
+                WhatsApp: +62 895-6133-69443<br>
                 Email: support@anarcyxreptile.com<br>
                 Lokasi: Jakarta, Indonesia
             </p>

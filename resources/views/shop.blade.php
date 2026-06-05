@@ -94,7 +94,7 @@
 
 @push('scripts')
     <script>
-        const OWNER_PHONE = "6281234567890";
+        const OWNER_PHONE = "62895613369443";
 
         // Database Unit Reptil (dinamis dari MongoDB Atlas)
         const dataElement = document.getElementById('mongodb-products-data');
@@ -156,29 +156,8 @@
             renderProducts(ALL_PRODUCTS);
         }
 
-        // Inisialisasi basis data wishlist dari localStorage agar permanen saat reload
-        let localWishlist = localStorage.getItem('anarcyx_wishlist')
-            ? JSON.parse(localStorage.getItem('anarcyx_wishlist'))
-            : [];
-
-        // Fungsi klik tombol love (Favorit)
-        function toggleWishlist(productId) {
-            const index = localWishlist.indexOf(productId);
-            
-            if (index > -1) {
-                // Jika sudah ada di favorit, hapus dari list
-                localWishlist.splice(index, 1);
-            } else {
-                // Jika belum ada, masukkan ID produk ke daftar favorit
-                localWishlist.push(productId);
-            }
-            
-            // Simpan perubahan ke memori browser
-            localStorage.setItem('anarcyx_wishlist', JSON.stringify(localWishlist));
-            
-            // Panggil ulang applyFilters untuk menyortir ulang posisi card secara real-time
-            applyFilters();
-        }
+        // === WISHLIST GLOBAL ===
+        // Fungsi toggleWishlist akan menggunakan fungsi global dari navbar-scripts
 
         // Fungsi Utama Render Produk (Sudah Dilengkapi Formula Urutan Favorit Teratas)
         function renderProducts(productsList) {
@@ -188,27 +167,27 @@
                 return;
             }
 
-            // FORMULA SORTING: Produk yang di-love (ada di localWishlist) dipaksa naik ke index paling atas
+            // FORMULA SORTING: Produk yang di-love dipaksa naik ke index paling atas
+            const wishlistData = getLocalWishlist();
             const sortedProducts = [...productsList].sort((a, b) => {
-                const aFav = localWishlist.includes(a.id) ? 1 : 0;
-                const bFav = localWishlist.includes(b.id) ? 1 : 0;
-                return bFav - aFav; // Nilai 1 (Favorit) akan didorong ke atas Nilai 0
+                const aFav = wishlistData.some(item => item.id === a.id) ? 1 : 0;
+                const bFav = wishlistData.some(item => item.id === b.id) ? 1 : 0;
+                return bFav - aFav;
             });
 
             container.innerHTML = sortedProducts.map(product => {
-                // Cek apakah produk ini sedang berstatus favorit atau tidak
-                const isFavorite = localWishlist.includes(product.id) ? 'active' : '';
+                const isFavorite = wishlistData.some(item => item.id === product.id) ? 'active' : '';
 
                 return `
-                    <div class="product-card">
-                        <button class="wishlist-btn ${isFavorite}" onclick="toggleWishlist('${product.id}')">
-                            <svg width="18" height="18" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.5 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                    <div class="product-card" onclick="window.location='/products/${product.id}'" style="cursor: pointer;">
+                        <button class="wishlist-btn ${isFavorite}" data-product-id="${product.id}" onclick="toggleWishlistGlobal({ id: '${product.id}', name: '${product.name}', price: ${product.price}, image: '${product.image}' }); applyFilters();">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="${isFavorite ? '#ef4444' : 'none'}" stroke="${isFavorite ? '#ef4444' : 'currentColor'}" stroke-width="2"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
                         </button>
                         <div class="product-img-wrapper">
                             <img src="${product.image.startsWith('http') ? product.image : '/images/products/' + product.image}" alt="${product.name}">
                         </div>
                         <div class="product-info">
-                            <a href="/products/${product.id}" class="product-name" style="text-decoration: none; color: #111111; font-weight: 800; cursor: pointer;">${product.name}</a>
+                            <a href="/products/${product.id}" class="product-name" style="text-decoration: none; color: #111111; font-weight: 800; cursor: pointer;" onclick="event.stopPropagation()">${product.name}</a>
                             <span class="product-price">Rp ${product.price.toLocaleString('id-ID')}</span>
                         </div>
                             <div class="product-sciname">${product.sciname || 'Exotic Pet'}</div>
@@ -221,7 +200,7 @@
                         <p class="product-desc-snippet">${product.desc}</p>
                         
                         <div class="card-actions">
-                            <button class="btn-action btn-add-cart" onclick="addToCart('${product.id}')">Add to Cart</button>
+                            <button class="btn-action btn-add-cart" onclick="event.stopPropagation(); addToCart('${product.id}')">Add to Cart</button>
                             <button class="btn-action btn-quick-order" onclick="quickOrder('${product.name}', ${product.price})">Quick Order</button>
                         </div>
                     </div>
@@ -293,6 +272,7 @@
             } else {
                 renderProducts(ALL_PRODUCTS);
             }
+            syncHeartIconsUI();
         });
 
         function toggleFilter() {

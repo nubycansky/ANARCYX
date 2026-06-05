@@ -14,9 +14,15 @@
                 Cart <span class="cart-count" id="cartCount">0</span>
             </a>
         </li>
+        <li>
+            <a href="{{ route('wishlist') }}" @class(['active-nav' => request()->routeIs('wishlist')]) style="position: relative; display: flex; align-items: center;">
+                <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                <span id="wishlistCount" style="position: absolute; top: -8px; right: -10px; background: #ef4444; color: white; font-size: 0.6rem; font-weight: 800; padding: 2px 5px; border-radius: 10px; line-height: 1; min-width: 16px; text-align: center;">0</span>
+            </a>
+        </li>
         @auth
             <li>
-                <a href="{{ route('home') }}" @class(['login-link', 'active-nav' => false])>
+                <a href="{{ route('user.profile') }}" @class(['login-link', 'active-nav' => request()->routeIs('user.profile')])>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                     {{ auth()->user()->name }}
                 </a>
@@ -32,7 +38,7 @@
             </li>
         @else
             <li>
-                <a href="{{ route('auth.login') }}" @class(['login-link', 'active-nav' => request()->routeIs('auth.login', 'auth.handleLogin')])>
+                <a href="{{ route('login') }}" @class(['login-link', 'active-nav' => request()->routeIs('login', 'auth.handleLogin')])>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
                     Login
                 </a>
