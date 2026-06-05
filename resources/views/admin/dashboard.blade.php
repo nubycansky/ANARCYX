@@ -218,9 +218,9 @@
             <h3 style="margin: 0 0 5px 0; font-size: 1.2rem; font-weight: 800; color: #111;">🔔 Antrean Konfirmasi Pesanan Baru</h3>
             <p style="margin: 0 0 20px 0; font-size: 0.85rem; color: #666; font-weight: 600;">Mohon periksa ketersediaan stok produk sebelum menerima pesanan dari pengguna.</p>
 
-            <div style="display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: flex; flex-direction: column; gap: 12px;" id="pendingOrdersContainer">
                 @forelse($pendingOrders as $order)
-                    <div style="display: flex; justify-content: space-between; align-items: center; background: #F9FAF7; border: 1px solid #E5E5E5; padding: 16px 20px; border-radius: 12px;">
+                    <div data-order-id="{{ $order->_id }}" style="display: flex; justify-content: space-between; align-items: center; background: #F9FAF7; border: 1px solid #E5E5E5; padding: 16px 20px; border-radius: 12px;">
                         <div style="text-align: left;">
                             <div style="font-weight: 800; color: #283221; font-size: 0.95rem;">#{{ $order->order_number ?? substr($order->_id, 0, 8) }} - {{ $order->customer_name }}</div>
                             <div style="font-size: 0.8rem; color: #666; font-weight: 600; margin-top: 2px;">
@@ -235,7 +235,7 @@
                         </div>
                     </div>
                 @empty
-                    <div style="padding: 20px; color: #888; font-style: italic; text-align: center; background: #FAFAFA; border-radius: 12px; border: 1px solid #EEEEEE;">
+                    <div id="pendingOrdersEmpty" style="padding: 20px; color: #888; font-style: italic; text-align: center; background: #FAFAFA; border-radius: 12px; border: 1px solid #EEEEEE;">
                         ✨ Semua pesanan baru telah dikonfirmasi. Antrean kosong!
                     </div>
                 @endforelse
@@ -468,5 +468,75 @@
             }
         }
     </script>
+
+    <script>
+        // Real-Time polling pending orders setiap 7 detik
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('pendingOrdersContainer');
+            if (!container) return;
+
+            let knownIds = new Set();
+            container.querySelectorAll('[data-order-id]').forEach(function(el) {
+                knownIds.add(el.getAttribute('data-order-id'));
+            });
+
+            function pollPendingOrders() {
+                fetch('{{ route("admin.api.pending") }}')
+                    .then(function(res) { return res.json(); })
+                    .then(function(data) {
+                        if (!data.orders || data.orders.length === 0) return;
+                        var anyNew = false;
+                        data.orders.forEach(function(order) {
+                            if (knownIds.has(order._id)) return;
+                            anyNew = true;
+                            knownIds.add(order._id);
+
+                            var emptyEl = document.getElementById('pendingOrdersEmpty');
+                            if (emptyEl) emptyEl.remove();
+
+                            var card = document.createElement('div');
+                            card.setAttribute('data-order-id', order._id);
+                            card.style.cssText = 'display: flex; justify-content: space-between; align-items: center; background: #F9FAF7; border: 1px solid #E5E5E5; padding: 16px 20px; border-radius: 12px;';
+
+                            var totalFormatted = Number(order.total_price).toLocaleString('id-ID');
+                            var orderDisplay = order.order_number || order._id.substring(0, 8);
+
+                            card.innerHTML =
+                                '<div style="text-align: left;">' +
+                                    '<div style="font-weight: 800; color: #283221; font-size: 0.95rem;">#' + orderDisplay + ' - ' + order.customer_name + '</div>' +
+                                    '<div style="font-size: 0.8rem; color: #666; font-weight: 600; margin-top: 2px;">' +
+                                        'Total: <span style="color: #111; font-weight: 700;">Rp' + totalFormatted + '</span> | WhatsApp: ' + order.customer_phone +
+                                    '</div>' +
+                                '</div>' +
+                                '<div style="display: flex; gap: 8px;">' +
+                                    '<button type="button" onclick="openAdminActionModal(\'terima\', \'' + order.approve_url + '\')" style="background: #DEF7EC; color: #03543F; border: 1px solid #BBE5C5; padding: 8px 16px; border-radius: 8px; font-weight: 800; font-size: 0.8rem; cursor: pointer;">Terima & Proses</button>' +
+                                    '<button type="button" onclick="openAdminActionModal(\'tolak\', \'' + order.reject_url + '\')" style="background: #FEE2E2; color: #9B1C1C; border: 1px solid #FCA5A5; padding: 8px 16px; border-radius: 8px; font-weight: 800; font-size: 0.8rem; cursor: pointer; margin-left: 5px;">Tolak</button>' +
+                                '</div>';
+
+                            card.style.animation = 'fadeInOrder 0.4s ease';
+                            container.insertBefore(card, container.firstChild);
+                        });
+
+                        if (anyNew) {
+                            var totalBadge = document.getElementById('pendingCountBadge');
+                            if (totalBadge) {
+                                var count = container.querySelectorAll('[data-order-id]').length;
+                                totalBadge.textContent = count;
+                            }
+                        }
+                    })
+                    .catch(function() {});
+            }
+
+            setInterval(pollPendingOrders, 7000);
+        });
+    </script>
+
+    <style>
+        @keyframes fadeInOrder {
+            from { opacity: 0; transform: translateY(-10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </body>
 </html>

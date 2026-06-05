@@ -23,6 +23,7 @@ Route::get('/cart', function () {
 
 Route::view('/wishlist', 'wishlist')->name('wishlist');
 Route::post('/checkout', [HomeController::class, 'submitOrder'])->name('checkout.submit');
+Route::post('/checkout/quick-wa', [HomeController::class, 'quickWa'])->name('checkout.quick');
 Route::view('/order-success', 'order-success')->name('order.success');
 
 Route::middleware(['auth'])->group(function () {
@@ -178,6 +179,7 @@ Route::post('/admin/logout', [AdminController::class, 'handleLogout'])->name('ad
 
 Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
+    Route::get('/api/pending-orders', [AdminController::class, 'pendingOrdersApi'])->name('api.pending');
     Route::get('/notifications', [AdminController::class, 'showAllNotifications'])->name('notifications');
     Route::delete('/notifications/clear', [AdminController::class, 'clearNotifications'])->name('notifications.clear');
     Route::delete('/notifications/destroy/{id}', [AdminController::class, 'destroyNotification'])->name('notifications.destroy');

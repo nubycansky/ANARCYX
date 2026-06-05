@@ -84,7 +84,7 @@
 
 @section('content')
 
-    <div id="authStatusData" data-authenticated="{{ auth()->check() ? 'true' : 'false' }}" style="display: none;"></div>
+    <div id="authStatusData" data-authenticated="{{ auth()->check() ? 'true' : 'false' }}" data-name="{{ auth()->check() ? auth()->user()->name : '' }}" data-phone="{{ auth()->check() ? (auth()->user()->phone_number ?? '') : '' }}" data-address="{{ auth()->check() ? (auth()->user()->address ?? '') : '' }}" style="display: none;"></div>
 
     <main>
         <div class="cart-page-wrapper" id="mainCartPageLayout">
@@ -354,10 +354,22 @@
                             `� *Total Tagihan:* Rp ${totalAkhir.toLocaleString('id-ID')}\n\n` +
                             `Mohon dibantu infokan langkah pembayarannya. Terima kasih!`;
 
+            const authData = document.getElementById('authStatusData');
+            const isAuth = authData && authData.getAttribute('data-authenticated') === 'true';
+            let customerName, customerPhone, customerAddress;
+            if (isAuth) {
+                customerName = authData.getAttribute('data-name') || 'Guest User';
+                customerPhone = authData.getAttribute('data-phone') || '';
+                customerAddress = authData.getAttribute('data-address') || '';
+            } else {
+                customerName = localStorage.getItem('anarcyx_customer_name') || 'Guest User';
+                customerPhone = localStorage.getItem('anarcyx_customer_phone') || '';
+                customerAddress = localStorage.getItem('anarcyx_customer_address') || '';
+            }
             const payload = {
-                customer_name: localStorage.getItem('anarcyx_customer_name') || 'Guest User',
-                customer_phone: localStorage.getItem('anarcyx_customer_phone') || '',
-                customer_address: localStorage.getItem('anarcyx_customer_address') || '',
+                customer_name: customerName,
+                customer_phone: customerPhone,
+                customer_address: customerAddress,
                 total_price: totalAkhir,
                 items: localCart.map(item => ({
                     product_id: item.id,

@@ -121,6 +121,28 @@ class AdminController extends Controller
         ));
     }
 
+    public function pendingOrdersApi()
+    {
+        $pending = Order::where('status', 'pending')
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($o) {
+                return [
+                    '_id'            => (string)$o->_id,
+                    'order_number'   => $o->order_number ?? substr((string)$o->_id, 0, 8),
+                    'order_id_string'=> $o->order_id_string ?? '#ORD-' . substr((string)$o->_id, -5),
+                    'customer_name'  => $o->customer_name,
+                    'customer_phone' => $o->customer_phone ?? '-',
+                    'total_price'    => (int)$o->total_price,
+                    'created_at'     => (string)$o->created_at,
+                    'approve_url'    => route('admin.orders.approve', $o->_id),
+                    'reject_url'     => route('admin.orders.reject', $o->_id),
+                ];
+            });
+
+        return response()->json(['orders' => $pending]);
+    }
+
     // ==========================================
     // 2. PAGE MANAGEMENT PRODUK (LIVE METRIK & VALUE ASSET)
     // ==========================================

@@ -114,7 +114,7 @@
             </p>
 
             <div style="max-width: 350px;">
-                <button class="btn-action btn-quick-order" style="width: 100%; padding: 15px;" onclick="orderSpesifik('{{ $reptile->name }}', '{{ $reptile->price }}')">
+                <button class="btn-action btn-quick-order" style="width: 100%; padding: 15px;" onclick="orderSpesifik('{{ $reptile->name }}', '{{ $reptile->price }}', '{{ $reptile->id }}')">
                     Beli Lewat WhatsApp Owner &rarr;
                 </button>
                 <button class="btn-action btn-add-cart" style="width: 100%; padding: 15px; margin-top: 12px;" onclick="addToCartFromDetail('{{ $reptile->id }}', '{{ $reptile->name }}', '{{ $reptile->price }}', '{{ $reptile->image }}')">
@@ -243,10 +243,26 @@
     <script>
         const OWNER_PHONE = "62895613369443";
 
-        function orderSpesifik(name, price) {
-            const formatted = Number(price).toLocaleString('id-ID');
-            const msg = `Halo Kak, saya sudah membaca detail unitnya di website. Saya berminat memesan:\n\n*Unit:* ${name}\n*Harga:* Rp.${formatted}\n\nBagaimana metode pembayarannya?`;
-            window.open(`https://wa.me/${OWNER_PHONE}?text=${encodeURIComponent(msg)}`, '_blank');
+        function orderSpesifik(name, price, productId) {
+            const payload = {
+                product_name: name,
+                price: price,
+                qty: 1,
+                product_id: productId || ''
+            };
+            fetch('{{ route("checkout.quick") }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                body: JSON.stringify(payload)
+            }).then(res => res.json()).then(data => {
+                if (data.success && data.wa_url) {
+                    window.open(data.wa_url, '_blank');
+                }
+            }).catch(() => {
+                const formatted = Number(price).toLocaleString('id-ID');
+                const msg = `Halo Kak, saya sudah membaca detail unitnya di website. Saya berminat memesan:\n\n*Unit:* ${name}\n*Harga:* Rp.${formatted}\n\nBagaimana metode pembayarannya?`;
+                window.open(`https://wa.me/${OWNER_PHONE}?text=${encodeURIComponent(msg)}`, '_blank');
+            });
         }
 
         function addToCartFromDetail(id, name, price, image) {

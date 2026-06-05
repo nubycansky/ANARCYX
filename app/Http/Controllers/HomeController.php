@@ -100,11 +100,22 @@ class HomeController extends Controller
             'items.*.price'        => 'required|numeric',
         ]);
 
+        if (Auth::check()) {
+            $user = Auth::user();
+            $customerName = $user->name;
+            $customerPhone = $user->phone_number ?? $request->customer_phone;
+            $customerAddress = $user->address ?? $request->customer_address;
+        } else {
+            $customerName = $request->customer_name ?? 'Guest User';
+            $customerPhone = $request->customer_phone ?? '-';
+            $customerAddress = $request->customer_address ?? '';
+        }
+
         $order = new Order();
-        $order->user_id = 'guest_' . uniqid();
-        $order->customer_name = $request->customer_name;
-        $order->customer_phone = $request->customer_phone;
-        $order->customer_address = $request->customer_address;
+        $order->user_id = Auth::check() ? Auth::id() : 'guest_' . uniqid();
+        $order->customer_name = $customerName;
+        $order->customer_phone = $customerPhone;
+        $order->customer_address = $customerAddress;
         $order->order_id_string = '#ORD-' . strtoupper(substr(uniqid(), -6));
         $order->total_price = $request->total_price;
         $order->status = 'pending';
@@ -118,6 +129,65 @@ class HomeController extends Controller
         ]);
 
         return response()->json(['success' => true, 'order_id' => (string)$order->_id]);
+    }
+
+    public function quickWa(Request $request)
+    {
+        $request->validate([
+            'product_name' => 'required|string|max:200',
+            'price'        => 'required|numeric',
+            'product_id'   => 'nullable|string',
+            'qty'          => 'nullable|integer|min:1',
+        ]);
+
+        $qty = $request->qty ?? 1;
+
+        if (Auth::check()) {
+            $user = Auth::user();
+            $customerName = $user->name;
+            $customerPhone = $user->phone_number ?? '-';
+        } else {
+            $customerName = 'Guest User';
+            $customerPhone = '-';
+        }
+
+        $order = new Order();
+        $order->user_id = Auth::check() ? Auth::id() : 'guest_' . uniqid();
+        $order->customer_name = $customerName;
+        $order->customer_phone = $customerPhone;
+        $order->order_id_string = '#ORD-' . strtoupper(substr(uniqid(), -6));
+        $order->total_price = (int)$request->price * $qty;
+        $order->status = 'pending';
+        $order->items = [[
+            'product_id'   => $request->product_id ?? '',
+            'product_name' => $request->product_name,
+            'qty'          => $qty,
+            'price'        => (int)$request->price,
+        ]];
+        $order->save();
+
+        Notification::create([
+            'type' => 'order',
+            'message' => '?? Pesanan cepat masuk ' . $order->order_id_string . ' dari ' . $customerName,
+            'created_at' => now()
+        ]);
+
+        $formattedPrice = number_format((int)$request->price, 0, ',', '.');
+        $totalFormatted = number_format((int)$request->price * $qty, 0, ',', '.');
+        $textMessage = "Halo AnarcyxReptile, saya ingin memesan unit ini:\n\n"
+                     . "• *Nama Unit:* {$request->product_name}\n"
+                     . "• *Harga:* Rp.{$formattedPrice}\n"
+                     . "• *Qty:* {$qty}\n"
+                     . "• *Total:* Rp.{$totalFormatted}\n\n"
+                     . "Mohon dibantu infokan langkah pembayarannya. Terima kasih!";
+
+        $waUrl = 'https://wa.me/62895613369443?text=' . urlencode($textMessage);
+
+        return response()->json([
+            'success' => true,
+            'wa_url'  => $waUrl,
+            'order_id' => (string)$order->_id,
+        ]);
     }
 
 }

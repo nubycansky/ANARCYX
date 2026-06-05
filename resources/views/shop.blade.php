@@ -201,7 +201,7 @@
                         
                         <div class="card-actions">
                             <button class="btn-action btn-add-cart" onclick="event.stopPropagation(); addToCart('${product.id}')">Add to Cart</button>
-                            <button class="btn-action btn-quick-order" onclick="quickOrder('${product.name}', ${product.price})">Quick Order</button>
+                            <button class="btn-action btn-quick-order" onclick="quickOrder('${product.name}', ${product.price}, '${product.id}')">Quick Order</button>
                         </div>
                     </div>
                 `;
@@ -250,10 +250,26 @@
             }, 3000);
         }
 
-        function quickOrder(name, price) {
-            const formattedPrice = Number(price).toLocaleString('id-ID');
-            const textMessage = `Halo AnarcyxReptile, saya ingin memesan unit ini:\n\n• *Nama Unit:* ${name}\n• *Harga:* Rp ${formattedPrice}`;
-            window.open(`https://wa.me/${OWNER_PHONE}?text=${encodeURIComponent(textMessage)}`, '_blank');
+        function quickOrder(name, price, productId) {
+            const payload = {
+                product_name: name,
+                price: price,
+                qty: 1,
+                product_id: productId || ''
+            };
+            fetch('{{ route("checkout.quick") }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                body: JSON.stringify(payload)
+            }).then(res => res.json()).then(data => {
+                if (data.success && data.wa_url) {
+                    window.open(data.wa_url, '_blank');
+                }
+            }).catch(() => {
+                const formattedPrice = Number(price).toLocaleString('id-ID');
+                const msg = `Halo AnarcyxReptile, saya ingin memesan unit ini:\n\n• *Nama Unit:* ${name}\n• *Harga:* Rp ${formattedPrice}`;
+                window.open(`https://wa.me/${OWNER_PHONE}?text=${encodeURIComponent(msg)}`, '_blank');
+            });
         }
 
         document.addEventListener("DOMContentLoaded", () => {
