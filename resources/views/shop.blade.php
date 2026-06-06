@@ -194,7 +194,6 @@
                         
                         <div class="badge-container">
                             <span class="badge">${product.category}</span>
-                            <span class="badge empty"></span>
                         </div>
 
                         <p class="product-desc-snippet">${product.short_description || (product.desc ? product.desc.substring(0, 90) + (product.desc.length > 90 ? '...' : '') : 'Reptil eksotis pilihan dengan kondisi sehat dan terawat.')}</p>

@@ -16,7 +16,6 @@
 
         .nav-right-side { display: flex; align-items: center; gap: 25px; margin-left: auto; font-weight: 700; position: relative; }
         .admin-profile-wrapper { display: flex; align-items: center; gap: 10px; }
-        .profile-img-circle { width: 38px; height: 38px; border-radius: 50%; border: 2px solid #283221; background-color: #4A5C3A; }
 
         .noti-bell-container { position: relative; cursor: pointer; color: #333; display: flex; align-items: center; }
         .bell-badge-red { position: absolute; top: 2px; right: 2px; width: 10px; height: 10px; background-color: #ef4444; border-radius: 50%; border: 1.5px solid #FFFFFF; display: block; }
@@ -183,7 +182,6 @@
 
             <div class="admin-profile-wrapper">
                 <span>Admin</span>
-                <div class="profile-img-circle"></div>
             </div>
 
             <form id="logout-form" action="{{ route('admin.logout') }}" method="POST" style="display: none;">@csrf</form>

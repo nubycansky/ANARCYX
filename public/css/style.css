@@ -399,12 +399,6 @@ header {
     font-weight: 600;
 }
 
-.badge.empty {
-    background-color: #e0e0e0;
-    width: 50px;
-    height: 22px;
-}
-
 .product-desc-snippet {
     font-size: 0.85rem;
     color: #666;
