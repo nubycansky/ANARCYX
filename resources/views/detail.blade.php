@@ -108,9 +108,9 @@
             <h2>{{ $reptile->name }}</h2>
             <div class="detail-price">Rp.{{ number_format($reptile->price, 0, ',', '.') }}</div>
             
-            <h3 style="margin-bottom: 10px; color: #111;">Deskripsi Singkat</h3>
+            <h3 style="margin-bottom: 10px; color: #111;">Deskripsi</h3>
             <p class="detail-desc-text">
-                {{ $reptile->description ?? 'Reptil premium sehat, aktif, makan lancar, dan sudah melalui proses karantina ketat oleh tim ahli ahli kami.' }}
+                {{ $reptile->description ?? $reptile->desc ?? 'Reptil premium sehat, aktif, makan lancar, dan sudah melalui proses karantina ketat oleh tim ahli kami.' }}
             </p>
 
             <div style="max-width: 350px;">

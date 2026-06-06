@@ -197,7 +197,7 @@
                             <span class="badge empty"></span>
                         </div>
 
-                        <p class="product-desc-snippet">${product.desc}</p>
+                        <p class="product-desc-snippet">${product.short_description || (product.desc ? product.desc.substring(0, 90) + (product.desc.length > 90 ? '...' : '') : 'Reptil eksotis pilihan dengan kondisi sehat dan terawat.')}</p>
                         
                         <div class="card-actions">
                             <button class="btn-action btn-add-cart" onclick="event.stopPropagation(); addToCart('${product.id}')">Add to Cart</button>

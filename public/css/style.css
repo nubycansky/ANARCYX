@@ -690,9 +690,6 @@ header {
 .cart-summary-title { font-size: 1.4rem; font-weight: 800; color: #111; margin-bottom: 25px; }
 .cart-subtotal-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 1rem; color: #555; }
 .cart-subtotal-row.total { border-top: 1px solid #f0f0f0; padding-top: 15px; margin-top: 15px; font-weight: 800; font-size: 1.3rem; color: #111; }
-.cart-coupon-flex { display: flex; gap: 10px; margin-bottom: 25px; }
-.cart-coupon-input { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.9rem; outline: none; }
-.btn-coupon-apply { background-color: var(--nav-footer-bg); color: white; border: none; padding: 0 18px; border-radius: 8px; font-weight: 600; cursor: pointer; }
 .cart-empty-text { grid-column: 1/-1; text-align: center; color: #777; font-style: italic; padding: 60px 0; font-size: 1.1rem; }
 
 /* Kustom Tampilan Halaman Cart Kosong (Sesuai Revisi Minimalis) */

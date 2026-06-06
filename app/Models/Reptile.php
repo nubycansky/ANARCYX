@@ -21,6 +21,8 @@ class Reptile extends Model
         'price',
         'stock',
         'image',
-        'desc'
+        'desc',
+        'description',
+        'short_description'
     ];
 }

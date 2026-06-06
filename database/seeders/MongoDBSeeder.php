@@ -35,6 +35,8 @@ class MongoDBSeeder extends Seeder
             'stock' => 5,
             'image' => '1716200001.jpg', // Dummy name untuk file gambar kamu nanti
             'desc' => 'Karakter jinak khas badak, memiliki tanduk unik kecil di bagian hidung depan.',
+            'description' => 'Karakter jinak khas badak, memiliki tanduk unik kecil di bagian hidung depan. Reptil ini sangat cocok untuk kolektor pemula maupun berpengalaman, dengan perawatan yang relatif mudah dan temperamen yang tenang.',
+            'short_description' => 'Karakter jinak khas badak, tanduk unik di hidung.',
             'attributes' => [
                 'morph' => 'Cyclura cornuta',
                 'weight' => '1.5kg',
@@ -49,6 +51,8 @@ class MongoDBSeeder extends Seeder
             'stock' => 12,
             'image' => '1716200002.jpg',
             'desc' => 'Sangat cocok untuk pemula, warna kuning cerah bersih minim bintik hitam.',
+            'description' => 'Sangat cocok untuk pemula, warna kuning cerah bersih minim bintik hitam. Leopard Gecko Hypo ini memiliki temperamen jinak dan mudah ditangani, menjadikannya pilihan sempurna untuk pertama kali memelihara reptil.',
+            'short_description' => 'Sangat cocok untuk pemula, warna kuning cerah bersih.',
             'attributes' => [
                 'morph' => 'Super Hypo Tangerine',
                 'weight' => '45g',
@@ -63,6 +67,8 @@ class MongoDBSeeder extends Seeder
             'stock' => 3,
             'image' => '1716200003.jpg',
             'desc' => 'Ular peliharaan paling tenang di dunia, bermotif eksotis alami.',
+            'description' => 'Ular peliharaan paling tenang di dunia, bermotif eksotis alami. Ball Python dikenal dengan sifatnya yang lembut dan mudah dirawat, cocok untuk pemula maupun kolektor reptil berpengalaman.',
+            'short_description' => 'Ular peliharaan paling tenang, motif eksotis alami.',
             'attributes' => [
                 'morph' => 'Classic Wild Type',
                 'weight' => '800g',

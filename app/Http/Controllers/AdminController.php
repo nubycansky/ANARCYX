@@ -204,6 +204,8 @@ class AdminController extends Controller
             'price' => (int)$request->price,
             'stock' => (int)$request->stock,
             'desc' => $request->desc,
+            'description' => $request->desc,
+            'short_description' => $request->short_description,
             'image' => $imageName,
             'attributes' => [
                 'morph' => $request->morph ?? 'Normal morph',
@@ -231,6 +233,8 @@ class AdminController extends Controller
         $product->price = (int)$request->price;
         $product->stock = (int)$request->stock;
         $product->desc = $request->desc;
+        $product->description = $request->desc;
+        $product->short_description = $request->short_description;
 
         if ($request->hasFile('image')) {
             if($product->image && $product->image != 'default.jpg') {

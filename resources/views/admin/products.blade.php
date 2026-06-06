@@ -292,7 +292,7 @@
                                     $currentMorph = $p->attributes['morph'] ?? 'Normal Morph';
                                 @endphp
                                 
-                                <button class="btn-icon-action" onclick="openEditModal('{{ $p->id }}', '{{ $p->name }}', '{{ $p->category }}', '{{ $p->price }}', '{{ $p->stock }}', '{{ $p->desc }}', '{{ $currentMorph }}', '{{ $p->image }}')">
+                                <button class="btn-icon-action" onclick="openEditModal('{{ $p->id }}', '{{ $p->name }}', '{{ $p->category }}', '{{ $p->price }}', '{{ $p->stock }}', '{{ $p->desc }}', '{{ $currentMorph }}', '{{ $p->image }}', '{{ $p->short_description }}')">
                                     <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                                 </button>
                                 
@@ -350,8 +350,12 @@
                         <input type="number" name="stock" id="input-stock" placeholder="e.g. 5">
                         <span class="error-message-text">Jumlah stok wajib diisi!</span>
                     </div>
+                    <div class="input-block-group" id="group-short_desc">
+                        <label>Short Description (Card)</label>
+                        <textarea name="short_description" id="input-short_desc" rows="2" placeholder="Cuplikan singkat untuk kartu produk..."></textarea>
+                    </div>
                     <div class="input-block-group" id="group-desc">
-                        <label>Description</label>
+                        <label>Deskripsi Lengkap</label>
                         <textarea name="desc" id="input-desc" rows="3" placeholder="Kondisi kesehatan reptil mulus..."></textarea>
                         <span class="error-message-text">Deskripsi produk wajib diisi!</span>
                     </div>
@@ -441,13 +445,14 @@
             document.getElementById('input-price').value = "";
             document.getElementById('input-stock').value = "";
             document.getElementById('input-desc').value = "";
+            document.getElementById('input-short_desc').value = "";
             document.getElementById('input-image').value = "";
             document.getElementById('imagePreview').style.display = 'none';
             
             document.getElementById('productFormModal').classList.add('show');
         }
 
-        function openEditModal(id, name, category, price, stock, desc, morph, image) {
+        function openEditModal(id, name, category, price, stock, desc, morph, image, shortDescription) {
             isEditMode = true;
             document.getElementById('modalTitle').innerText = "Edit Product Unit";
             document.getElementById('mainCrudForm').action = "/admin/products/update/" + id;
@@ -459,6 +464,7 @@
             document.getElementById('input-price').value = price;
             document.getElementById('input-stock').value = stock;
             document.getElementById('input-desc').value = desc;
+            document.getElementById('input-short_desc').value = shortDescription || '';
 
             var preview = document.getElementById('imagePreview');
             if (image && image !== 'default.jpg') {

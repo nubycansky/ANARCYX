@@ -64,7 +64,7 @@
                     <div class="product-sciname">{{ $rep->attributes['morph'] ?? 'Exotic Species' }}</div>
 
                     <div class="product-desc-snippet">
-                        {{ \Illuminate\Support\Str::limit($rep->desc ?? 'Reptil eksotis pilihan dengan kondisi sehat dan terawat.', 90) }}
+                        {{ \Illuminate\Support\Str::limit($rep->short_description ?? $rep->desc ?? 'Reptil eksotis pilihan dengan kondisi sehat dan terawat.', 90) }}
                     </div>
 
                     <div class="card-actions">

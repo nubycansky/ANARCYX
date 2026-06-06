@@ -105,11 +105,6 @@
                         <span id="summaryShipping">Rp 20.000</span>
                     </div>
                     
-                    <div class="cart-coupon-flex">
-                        <input type="text" class="cart-coupon-input" placeholder="Kode Kupon / Voucher">
-                        <button class="btn-coupon-apply">Apply</button>
-                    </div>
-                    
                     <div class="cart-subtotal-row total">
                         <span>Total Keseluruhan</span>
                         <span id="summaryTotal">Rp 0</span>
@@ -224,11 +219,6 @@
                         <div class="cart-subtotal-row">
                             <span>Biaya Pengiriman</span>
                             <span id="summaryShipping">Rp 20.000</span>
-                        </div>
-                        
-                        <div class="cart-coupon-flex">
-                            <input type="text" class="cart-coupon-input" placeholder="Kode Kupon / Voucher">
-                            <button class="btn-coupon-apply">Apply</button>
                         </div>
                         
                         <div class="cart-subtotal-row total">
