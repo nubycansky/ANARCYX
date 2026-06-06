@@ -89,28 +89,37 @@ Route::get('/seed/{key}', function ($key) {
         'attributes' => ['morph' => 'Classic Wild Type', 'weight' => '800g', 'age' => 'Sub-Adult']
     ]);
 
+    $rep1Price = (int)$rep1->price;
+    $rep3Price = (int)$rep3->price;
     Order::create([
         'user_id' => 'guest_user_1',
         'customer_name' => 'Rizky Ardiansyah',
         'order_id_string' => '#ORD-98214',
-        'total_price' => 1550000,
+        'subtotal' => $rep1Price + $rep3Price,
+        'shipping_cost' => 20000,
+        'total_amount' => $rep1Price + $rep3Price + 20000,
+        'total_price' => $rep1Price + $rep3Price + 20000,
         'status' => 'delivered',
         'shipping_address' => 'Jl. Merdeka No. 10, Jakarta',
         'items' => [
-            ['product_id' => $rep1->id, 'name' => $rep1->name, 'qty' => 1, 'price' => $rep1->price],
-            ['product_id' => $rep3->id, 'name' => $rep3->name, 'qty' => 1, 'price' => $rep3->price]
+            ['product_id' => $rep1->id, 'name' => $rep1->name, 'qty' => 1, 'price' => $rep1Price],
+            ['product_id' => $rep3->id, 'name' => $rep3->name, 'qty' => 1, 'price' => $rep3Price]
         ]
     ]);
 
+    $rep2Price = (int)$rep2->price;
     Order::create([
         'user_id' => 'guest_user_2',
         'customer_name' => 'Amalia Putri',
         'order_id_string' => '#ORD-98211',
-        'total_price' => 650000,
+        'subtotal' => $rep2Price,
+        'shipping_cost' => 20000,
+        'total_amount' => $rep2Price + 20000,
+        'total_price' => $rep2Price + 20000,
         'status' => 'confirmed',
         'shipping_address' => 'Perumahan Indah B3, Bogor',
         'items' => [
-            ['product_id' => $rep2->id, 'name' => $rep2->name, 'qty' => 1, 'price' => $rep2->price]
+            ['product_id' => $rep2->id, 'name' => $rep2->name, 'qty' => 1, 'price' => $rep2Price]
         ]
     ]);
 

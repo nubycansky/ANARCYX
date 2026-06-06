@@ -93,27 +93,41 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @php $grandTotal = 0; @endphp
+                    @php
+                        $itemsSubtotal = 0;
+                    @endphp
                     @forelse($order->items ?? [] as $item)
                         @php
                             $itemName = $item['product_name'] ?? $item['name'] ?? 'Produk';
                             $itemQty = (int)($item['qty'] ?? 1);
                             $itemPrice = (float)($item['price'] ?? 0);
-                            $subtotal = $itemQty * $itemPrice;
-                            $grandTotal += $subtotal;
+                            $lineTotal = $itemQty * $itemPrice;
+                            $itemsSubtotal += $lineTotal;
                         @endphp
                         <tr>
                             <td>{{ $itemName }}</td>
                             <td class="text-center">{{ $itemQty }}</td>
                             <td class="text-right">Rp {{ number_format($itemPrice, 0, ',', '.') }}</td>
-                            <td class="text-right fw-bold">Rp {{ number_format($subtotal, 0, ',', '.') }}</td>
+                            <td class="text-right fw-bold">Rp {{ number_format($lineTotal, 0, ',', '.') }}</td>
                         </tr>
                     @empty
                         <tr><td colspan="4" style="text-align:center;color:#888;">Tidak ada item</td></tr>
                     @endforelse
-                    <tr class="total-row">
-                        <td colspan="3" class="text-right">Total Pembayaran</td>
-                        <td class="text-right">Rp {{ number_format($grandTotal, 0, ',', '.') }}</td>
+                    @php
+                        $totalAmount = (float)($order->total_amount ?? $order->total_price ?? $itemsSubtotal);
+                        $shippingCost = (float)($order->shipping_cost ?? $order->ongkir ?? max(0, $totalAmount - $itemsSubtotal));
+                    @endphp
+                    <tr>
+                        <td colspan="3" style="text-align:right;padding:8px;color:#888;">Subtotal Produk:</td>
+                        <td style="padding:8px;text-align:right;color:#333;font-weight:700;">Rp {{ number_format($itemsSubtotal, 0, ',', '.') }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" style="text-align:right;padding:8px;color:#888;">Biaya Pengantaran:</td>
+                        <td style="padding:8px;text-align:right;color:#333;font-weight:700;">Rp {{ number_format($shippingCost, 0, ',', '.') }}</td>
+                    </tr>
+                    <tr style="background:#1A2315;border-top:2px solid #6B8E4E;">
+                        <td colspan="3" style="text-align:right;padding:10px;font-weight:bold;color:#6B8E4E;">Total Pembayaran:</td>
+                        <td style="padding:10px;text-align:right;font-weight:bold;color:#6B8E4E;font-size:1.1rem;">Rp {{ number_format($totalAmount, 0, ',', '.') }}</td>
                     </tr>
                 </tbody>
             </table>

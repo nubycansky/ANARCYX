@@ -133,7 +133,7 @@ class AdminController extends Controller
                     'order_id_string'=> $o->order_id_string ?? '#ORD-' . substr((string)$o->_id, -5),
                     'customer_name'  => $o->customer_name,
                     'customer_phone' => $o->customer_phone ?? '-',
-                    'total_price'    => (int)$o->total_price,
+                    'total_price'    => (int)($o->total_amount ?? $o->total_price ?? 0),
                     'created_at'     => (string)$o->created_at,
                     'approve_url'    => route('admin.orders.approve', $o->_id),
                     'reject_url'     => route('admin.orders.reject', $o->_id),
@@ -385,6 +385,31 @@ class AdminController extends Controller
             }
 
             if ($newStatus === 'confirmed' && $oldStatus !== 'confirmed') {
+                if (!empty($order->items) && is_array($order->items)) {
+                    $stockWarnings = [];
+                    foreach ($order->items as $item) {
+                        $productId = $item['product_id'] ?? $item['id'] ?? null;
+                        $qty = (int)($item['qty'] ?? 1);
+                        if ($productId) {
+                            $product = \App\Models\Reptile::find($productId);
+                            if ($product) {
+                                if ($product->stock < $qty) {
+                                    $stockWarnings[] = $product->name . ' (stok: ' . $product->stock . ', diminta: ' . $qty . ')';
+                                }
+                                $product->decrement('stock', $qty);
+                                if ($product->stock < 0) {
+                                    $product->stock = 0;
+                                    $product->save();
+                                }
+                            }
+                        }
+                    }
+                    if (!empty($stockWarnings)) {
+                        $warningMsg = 'Stok tidak mencukupi untuk: ' . implode(', ', $stockWarnings) . '. Stok telah diset ke 0.';
+                        \Illuminate\Support\Facades\Session::flash('flash_warning', $warningMsg);
+                    }
+                }
+
                 \App\Models\Invoice::create([
                     'order_id' => $id,
                     'order_id_string' => $order->order_id_string ?? '#ORD-' . $id,

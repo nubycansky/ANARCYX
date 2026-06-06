@@ -16,6 +16,9 @@ class Order extends Model
         'customer_address',
         'order_id_string',
         'total_price',
+        'subtotal',
+        'shipping_cost',
+        'total_amount',
         'status',
         'shipping_address',
         'items'

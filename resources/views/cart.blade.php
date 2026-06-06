@@ -370,7 +370,7 @@
                 customer_name: customerName,
                 customer_phone: customerPhone,
                 customer_address: customerAddress,
-                total_price: totalAkhir,
+                shipping_cost: SHIPPING_COST,
                 items: localCart.map(item => ({
                     product_id: item.id,
                     product_name: item.name,

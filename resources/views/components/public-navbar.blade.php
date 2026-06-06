@@ -1,7 +1,7 @@
 <nav>
     <div class="logo-container">
         <img src="{{ asset('images/logo/logo.jpeg') }}" alt="ANARCYX Logo">
-        <span class="brand-name">ANARCYXREPTILE</span>
+        <a href="{{ url('/') }}" style="text-decoration: none; color: inherit;"><span class="brand-name">ANARCYXREPTILE</span></a>
     </div>
     <div class="menu-toggle" id="mobile-menu"><span></span><span></span><span></span></div>
     <ul class="nav-links" id="nav-list">

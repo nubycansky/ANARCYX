@@ -224,7 +224,7 @@
                         <div style="text-align: left;">
                             <div style="font-weight: 800; color: #283221; font-size: 0.95rem;">#{{ $order->order_number ?? substr($order->_id, 0, 8) }} - {{ $order->customer_name }}</div>
                             <div style="font-size: 0.8rem; color: #666; font-weight: 600; margin-top: 2px;">
-                                Total: <span style="color: #111; font-weight: 700;">Rp{{ number_format($order->total_price, 0, ',', '.') }}</span> | WhatsApp: {{ $order->customer_phone ?? '-' }}
+                                Total: <span style="color: #111; font-weight: 700;">Rp{{ number_format($order->total_amount ?? $order->total_price, 0, ',', '.') }}</span> | WhatsApp: {{ $order->customer_phone ?? '-' }}
                             </div>
                         </div>
 

@@ -411,12 +411,17 @@
                     <input type="text" id="phone_number" name="phone_number" value="{{ old('phone_number', $user->phone_number) }}" required>
                     @error('phone_number')<div class="error-message">{{ $message }}</div>@enderror
                 </div>
+                <div class="form-group">
+                    <label for="address">Alamat Lengkap</label>
+                    <textarea id="address" name="address" rows="3" style="width:100%;padding:14px 16px;border:2px solid #e5e5e5;border-radius:10px;font-size:0.95rem;font-weight:600;color:#111;font-family:inherit;outline:none;resize:vertical;transition:border-color 0.3s ease;" onfocus="this.style.borderColor='var(--title-color)'" onblur="this.style.borderColor='#e5e5e5'">{{ old('address', $user->address) }}</textarea>
+                    @error('address')<div class="error-message">{{ $message }}</div>@enderror
+                </div>
                 <button type="submit" class="btn-save">Simpan Perubahan</button>
             </form>
         </div>
 
         <div class="profile-card">
-            <div class="password-section">
+            <div class="password-section" id="password-section">
                 <h3>Ubah Password</h3>
                 <button type="button" class="btn-password" onclick="togglePasswordForm()">Ubah Password</button>
 
@@ -425,17 +430,33 @@
                         @csrf
                         <div class="form-group">
                             <label for="current_password">Password Lama</label>
-                            <input type="password" id="current_password" name="current_password" placeholder="Masukkan password saat ini" required>
+                            <div style="position:relative;">
+                                <input type="password" id="current_password" name="current_password" placeholder="Masukkan password saat ini" value="{{ old('current_password') }}" required style="padding-right:45px;">
+                                <span onclick="togglePasswordVisibility('current_password','eye_current')" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);cursor:pointer;display:flex;align-items:center;" id="eye_current">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                </span>
+                            </div>
                             @error('current_password')<div class="error-message">{{ $message }}</div>@enderror
                         </div>
                         <div class="form-group">
                             <label for="new_password">Password Baru</label>
-                            <input type="password" id="new_password" name="new_password" placeholder="Minimal 6 karakter" required>
+                            <div style="position:relative;">
+                                <input type="password" id="new_password" name="new_password" placeholder="Minimal 6 karakter" value="{{ old('new_password') }}" required style="padding-right:45px;">
+                                <span onclick="togglePasswordVisibility('new_password','eye_new')" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);cursor:pointer;display:flex;align-items:center;" id="eye_new">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                </span>
+                            </div>
                             @error('new_password')<div class="error-message">{{ $message }}</div>@enderror
                         </div>
                         <div class="form-group">
                             <label for="new_password_confirmation">Konfirmasi Password Baru</label>
-                            <input type="password" id="new_password_confirmation" name="new_password_confirmation" placeholder="Ketik ulang password baru" required>
+                            <div style="position:relative;">
+                                <input type="password" id="new_password_confirmation" name="new_password_confirmation" placeholder="Ketik ulang password baru" value="{{ old('new_password_confirmation') }}" required style="padding-right:45px;">
+                                <span onclick="togglePasswordVisibility('new_password_confirmation','eye_confirm')" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);cursor:pointer;display:flex;align-items:center;" id="eye_confirm">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                </span>
+                            </div>
+                            @error('new_password_confirmation')<div class="error-message">{{ $message }}</div>@enderror
                         </div>
                         <div style="display:flex;gap:12px;">
                             <button type="submit" class="btn-save">Simpan Password</button>
@@ -506,6 +527,31 @@ function switchTab(tab) {
 
 function togglePasswordForm() {
     document.getElementById('password-form').classList.toggle('open');
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    @if ($errors->has('current_password') || $errors->has('new_password') || $errors->has('new_password_confirmation'))
+        const pwSection = document.getElementById('password-section');
+        if (pwSection) {
+            const pwForm = document.getElementById('password-form');
+            if (pwForm) pwForm.classList.add('open');
+            setTimeout(function() {
+                pwSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+        }
+    @endif
+});
+
+function togglePasswordVisibility(inputId, iconId) {
+    const input = document.getElementById(inputId);
+    const icon = document.getElementById(iconId);
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6B8E4E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`;
+    } else {
+        input.type = 'password';
+        icon.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+    }
 }
 </script>
 @endsection

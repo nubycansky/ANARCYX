@@ -198,6 +198,9 @@
         @if(session('flash_error'))
             <div class="flash-error-banner">{{ session('flash_error') }}</div>
         @endif
+        @if(session('flash_warning'))
+            <div class="flash-error-banner" style="background:#FEF3C7;border-color:#F59E0B;color:#92400E;">{{ session('flash_warning') }}</div>
+        @endif
 
         <section class="order-stats-grid">
             <div class="stat-card-box"><div class="stat-card-title">Total Orders</div><div class="stat-card-number">{{ $stats['total'] }}</div></div>
@@ -246,7 +249,7 @@
                         <td>{{ $order->customer_name ?? 'Guest User' }}</td>
                         <td>{{ $order->display_date }}</td>
                         <td>{{ $order->item_count }} item(s)</td>
-                        <td style="font-weight: 800; color: #283221;">Rp {{ number_format((int)($order->total_price ?? 0), 0, ',', '.') }}</td>
+                        <td style="font-weight: 800; color: #283221;">Rp {{ number_format((int)($order->total_amount ?? $order->total_price ?? 0), 0, ',', '.') }}</td>
                         <td><span class="badge-status {{ $order->status }}">{{ ucfirst($order->status) }}</span></td>
                         <td>
                             <div class="action-buttons-flex">

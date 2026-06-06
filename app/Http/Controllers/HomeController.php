@@ -92,12 +92,11 @@ class HomeController extends Controller
             'customer_name'    => 'required|string|max:200',
             'customer_phone'   => 'nullable|string|max:50',
             'customer_address' => 'nullable|string|max:500',
-            'total_price'      => 'required|numeric',
+            'shipping_cost'    => 'nullable|numeric|min:0',
             'items'            => 'required|array|min:1',
             'items.*.product_id'   => 'nullable|string',
             'items.*.product_name' => 'required|string',
             'items.*.qty'          => 'required|integer|min:1',
-            'items.*.price'        => 'required|numeric',
         ]);
 
         if (Auth::check()) {
@@ -111,15 +110,36 @@ class HomeController extends Controller
             $customerAddress = $request->customer_address ?? '';
         }
 
+        $items = [];
+        $subtotal = 0;
+        foreach ($request->items as $item) {
+            $product = \App\Models\Reptile::find($item['product_id']);
+            $realPrice = $product ? (int)$product->price : (int)($item['price'] ?? 0);
+            $qty = (int)$item['qty'];
+            $items[] = [
+                'product_id'   => $item['product_id'] ?? '',
+                'product_name' => $item['product_name'],
+                'qty'          => $qty,
+                'price'        => $realPrice,
+            ];
+            $subtotal += $realPrice * $qty;
+        }
+
+        $shippingCost = (int)($request->shipping_cost ?? 20000);
+        $totalAmount = $subtotal + $shippingCost;
+
         $order = new Order();
         $order->user_id = Auth::check() ? Auth::id() : 'guest_' . uniqid();
         $order->customer_name = $customerName;
         $order->customer_phone = $customerPhone;
         $order->customer_address = $customerAddress;
         $order->order_id_string = '#ORD-' . strtoupper(substr(uniqid(), -6));
-        $order->total_price = $request->total_price;
+        $order->subtotal = $subtotal;
+        $order->shipping_cost = $shippingCost;
+        $order->total_amount = $totalAmount;
+        $order->total_price = $totalAmount;
         $order->status = 'pending';
-        $order->items = $request->items;
+        $order->items = $items;
         $order->save();
 
         Notification::create([
@@ -151,18 +171,28 @@ class HomeController extends Controller
             $customerPhone = '-';
         }
 
+        $realPrice = (int)$request->price;
+        if ($request->product_id) {
+            $dbProduct = \App\Models\Reptile::find($request->product_id);
+            if ($dbProduct) $realPrice = (int)$dbProduct->price;
+        }
+        $itemTotal = $realPrice * $qty;
+
         $order = new Order();
         $order->user_id = Auth::check() ? Auth::id() : 'guest_' . uniqid();
         $order->customer_name = $customerName;
         $order->customer_phone = $customerPhone;
         $order->order_id_string = '#ORD-' . strtoupper(substr(uniqid(), -6));
-        $order->total_price = (int)$request->price * $qty;
+        $order->subtotal = $itemTotal;
+        $order->shipping_cost = 0;
+        $order->total_amount = $itemTotal;
+        $order->total_price = $itemTotal;
         $order->status = 'pending';
         $order->items = [[
             'product_id'   => $request->product_id ?? '',
             'product_name' => $request->product_name,
             'qty'          => $qty,
-            'price'        => (int)$request->price,
+            'price'        => $realPrice,
         ]];
         $order->save();
 
