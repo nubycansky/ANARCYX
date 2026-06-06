@@ -41,7 +41,11 @@
         <div class="inv-header">
             <div class="inv-header-top">
                 <div class="inv-brand">
-                    <img src="{{ public_path('images/logo/logo.jpeg') }}" alt="ANARCYX Logo" style="width: 50px; height: 50px; border-radius: 50%; object-fit: contain; background: #283221; padding: 2px; vertical-align: middle;">
+                    @if(!empty($logoData))
+                        <img src="{{ $logoData }}" alt="ANARCYX Logo" style="width: 50px; height: 50px; border-radius: 50%; object-fit: contain; background: #283221; padding: 2px; vertical-align: middle;">
+                    @else
+                        <div style="width: 50px; height: 50px; border-radius: 50%; background: #283221; color: #81c784; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem; flex-shrink: 0;">AR</div>
+                    @endif
                     <div>
                         <div class="inv-brand-name">ANARCYXREPTILE</div>
                         <div class="inv-brand-sub">Premium Exotic Shop</div>

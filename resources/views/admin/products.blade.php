@@ -288,11 +288,12 @@
                         <td>
                             <div class="action-buttons-flex" style="justify-content: center;">
                                 @php
-                                    // Kita amankan data morph ke variabel bersih sebelum masuk ke atribut JavaScript
                                     $currentMorph = $p->attributes['morph'] ?? 'Normal Morph';
+                                    $currentAge = $p->attributes['age'] ?? 'Adult';
+                                    $currentWeight = $p->attributes['weight'] ?? '';
                                 @endphp
                                 
-                                <button class="btn-icon-action" onclick="openEditModal('{{ $p->id }}', '{{ $p->name }}', '{{ $p->category }}', '{{ $p->price }}', '{{ $p->stock }}', '{{ $p->desc }}', '{{ $currentMorph }}', '{{ $p->image }}', '{{ $p->short_description }}')">
+                                <button class="btn-icon-action" onclick='openEditModal(@json($p->id), @json($p->name), @json($p->category), @json($p->price), @json($p->stock), @json($p->desc), @json($currentMorph), @json($p->image), @json($p->short_description), @json($p->characteristic), @json($p->habitat), @json($p->food), @json($p->type_info), @json($p->care_instructions), @json($p->lifespan), @json($p->max_size), @json($currentAge), @json($currentWeight))'>
                                     <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                                 </button>
                                 
@@ -340,6 +341,34 @@
                         <label>Morph Variant</label>
                         <input type="text" name="morph" id="input-morph" placeholder="e.g. Albino Motley / Normal">
                     </div>
+                    <div class="input-block-group" id="group-age">
+                        <label>Umur (Age)</label>
+                        <div class="select-wrapper-relative">
+                            <select name="age" id="input-age" class="filter-select-box" style="padding: 12px 16px; width: 100%;">
+                                <option value="Baby">Baby</option>
+                                <option value="Juvenile">Juvenile</option>
+                                <option value="Sub-Adult">Sub-Adult</option>
+                                <option value="Adult" selected>Adult</option>
+                            </select>
+                            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                        </div>
+                    </div>
+                    <div class="input-block-group" id="group-weight">
+                        <label>Berat (Weight)</label>
+                        <input type="text" name="weight" id="input-weight" placeholder="e.g. 1.2 kg">
+                    </div>
+                    <div class="input-block-group" id="group-max_size">
+                        <label>Ukuran Maks (Max Size)</label>
+                        <input type="text" name="max_size" id="input-max_size" placeholder="e.g. 60 - 80 cm">
+                    </div>
+                    <div class="input-block-group" id="group-lifespan">
+                        <label>Umur Hidup (Lifespan)</label>
+                        <input type="text" name="lifespan" id="input-lifespan" placeholder="e.g. 15 - 20 tahun">
+                    </div>
+                    <div class="input-block-group" id="group-type_info">
+                        <label>Jenis (Type/Species)</label>
+                        <input type="text" name="type_info" id="input-type_info" placeholder="e.g. Ball Python (Python regius)">
+                    </div>
                     <div class="input-block-group" id="group-price">
                         <label>Price (IDR)</label>
                         <input type="text" name="price" id="input-price" placeholder="e.g. 1500000">
@@ -359,6 +388,22 @@
                         <textarea name="desc" id="input-desc" rows="3" placeholder="Kondisi kesehatan reptil mulus..."></textarea>
                         <span class="error-message-text">Deskripsi produk wajib diisi!</span>
                     </div>
+                    <div class="input-block-group" id="group-characteristic">
+                        <label>Karakteristik</label>
+                        <textarea name="characteristic" id="input-characteristic" rows="3" placeholder="Ciri fisik, sifat, dan keunikan reptil ini..."></textarea>
+                    </div>
+                    <div class="input-block-group" id="group-habitat">
+                        <label>Habitat Asli</label>
+                        <textarea name="habitat" id="input-habitat" rows="3" placeholder="Asal-usul & kondisi alam tempat hidup reptil..."></textarea>
+                    </div>
+                    <div class="input-block-group" id="group-food">
+                        <label>Makanan (Pakan)</label>
+                        <textarea name="food" id="input-food" rows="3" placeholder="Jenis pakan, frekuensi makan, dan cara pemberian..."></textarea>
+                    </div>
+                    <div class="input-block-group" id="group-care_instructions">
+                        <label>Cara Perawatan</label>
+                        <textarea name="care_instructions" id="input-care_instructions" rows="4" placeholder="Tips setup kandang, suhu, kelembapan, lighting, dll..."></textarea>
+                    </div>
                     <div class="input-block-group" id="group-image">
                         <label>Current Image</label>
                         <img id="imagePreview" src="" alt="Preview" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 1px solid #E5E5E5; display: none;">
@@ -368,7 +413,7 @@
                     </div>
                 </div>
                 <div class="modal-action-buttons">
-                    <button type="submit" class="btn-modal-save">Save Data to MongoDB</button>
+                    <button type="submit" class="btn-modal-save">Save</button>
                     <button type="button" class="btn-modal-cancel" onclick="closeFormModal()">Batal</button>
                 </div>
             </form>
@@ -442,17 +487,26 @@
             document.getElementById('input-name').value = "";
             document.getElementById('input-category').value = "";
             document.getElementById('input-morph').value = "Normal morph";
+            document.getElementById('input-age').value = "Adult";
+            document.getElementById('input-weight').value = "";
+            document.getElementById('input-max_size').value = "";
+            document.getElementById('input-lifespan').value = "";
+            document.getElementById('input-type_info').value = "";
             document.getElementById('input-price').value = "";
             document.getElementById('input-stock').value = "";
             document.getElementById('input-desc').value = "";
             document.getElementById('input-short_desc').value = "";
+            document.getElementById('input-characteristic').value = "";
+            document.getElementById('input-habitat').value = "";
+            document.getElementById('input-food').value = "";
+            document.getElementById('input-care_instructions').value = "";
             document.getElementById('input-image').value = "";
             document.getElementById('imagePreview').style.display = 'none';
             
             document.getElementById('productFormModal').classList.add('show');
         }
 
-        function openEditModal(id, name, category, price, stock, desc, morph, image, shortDescription) {
+        function openEditModal(id, name, category, price, stock, desc, morph, image, shortDescription, characteristic, habitat, food, typeInfo, careInstructions, lifespan, maxSize, age, weight) {
             isEditMode = true;
             document.getElementById('modalTitle').innerText = "Edit Product Unit";
             document.getElementById('mainCrudForm').action = "/admin/products/update/" + id;
@@ -461,10 +515,19 @@
             document.getElementById('input-name').value = name;
             document.getElementById('input-category').value = category;
             document.getElementById('input-morph').value = morph;
+            document.getElementById('input-age').value = age || 'Adult';
+            document.getElementById('input-weight').value = weight || '';
+            document.getElementById('input-max_size').value = maxSize || '';
+            document.getElementById('input-lifespan').value = lifespan || '';
+            document.getElementById('input-type_info').value = typeInfo || '';
             document.getElementById('input-price').value = price;
             document.getElementById('input-stock').value = stock;
             document.getElementById('input-desc').value = desc;
             document.getElementById('input-short_desc').value = shortDescription || '';
+            document.getElementById('input-characteristic').value = characteristic || '';
+            document.getElementById('input-habitat').value = habitat || '';
+            document.getElementById('input-food').value = food || '';
+            document.getElementById('input-care_instructions').value = careInstructions || '';
 
             var preview = document.getElementById('imagePreview');
             if (image && image !== 'default.jpg') {

@@ -52,6 +52,147 @@
             transition: background 0.2s;
         }
         .btn-add-cart:hover { background-color: #55723e; }
+
+        .desc-section-wrap {
+            width: calc(100% - 40px);
+            max-width: 100% !important;
+            margin: 0 auto 30px auto;
+            padding: 0 30px;
+        }
+        .desc-card {
+            background: #FFFFFF;
+            border: 1px solid #ECECEC;
+            border-radius: 20px;
+            padding: 45px 50px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+        }
+        .desc-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 8px;
+        }
+        .desc-header-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #6B8E4E 0%, #4A5C3A 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            flex-shrink: 0;
+        }
+        .desc-header h2 {
+            margin: 0;
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #111;
+        }
+        .desc-header p {
+            margin: 4px 0 0;
+            font-size: 0.85rem;
+            color: #888;
+            font-weight: 500;
+        }
+        .desc-divider {
+            height: 1px;
+            background: #EFEFEF;
+            margin: 25px 0 30px;
+        }
+        .desc-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-bottom: 35px;
+        }
+        .desc-info-card {
+            background: #FAFBF7;
+            border: 1px solid #EFF2E9;
+            border-radius: 14px;
+            padding: 20px 22px;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+        }
+        .desc-info-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .desc-info-icon.green { background: rgba(107,142,78,0.12); color: #4A5C3A; }
+        .desc-info-icon.amber { background: rgba(217,158,74,0.15); color: #B07A20; }
+        .desc-info-icon.blue  { background: rgba(76,128,167,0.13); color: #3D6B91; }
+        .desc-info-icon.purple{ background: rgba(122,90,167,0.13); color: #6A4CA0; }
+        .desc-info-icon.rose  { background: rgba(196,90,120,0.13); color: #B04A66; }
+        .desc-info-icon.teal  { background: rgba(58,138,131,0.14); color: #2F7A75; }
+        .desc-info-content { min-width: 0; flex: 1; }
+        .desc-info-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        .desc-info-value {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #1F1F1F;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+        .desc-info-value.muted { color: #B0B0B0; font-weight: 600; font-style: italic; }
+
+        .desc-content-block { margin-bottom: 28px; }
+        .desc-content-block:last-child { margin-bottom: 0; }
+        .desc-content-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: #111;
+            margin-bottom: 12px;
+        }
+        .desc-content-title .tag {
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 20px;
+            background: rgba(107,142,78,0.12);
+            color: #4A5C3A;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .desc-content-text {
+            font-size: 0.95rem;
+            line-height: 1.85;
+            color: #444;
+            background: #FAFBF7;
+            border-left: 3px solid #6B8E4E;
+            padding: 18px 22px;
+            border-radius: 0 12px 12px 0;
+            white-space: pre-line;
+        }
+        .desc-content-text.empty {
+            background: #F7F7F4;
+            border-left-color: #D1D1C7;
+            color: #A5A597;
+            font-style: italic;
+        }
+
+        @media (max-width: 900px) {
+            .desc-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 600px) {
+            .desc-grid { grid-template-columns: 1fr; }
+            .desc-card { padding: 30px 22px; }
+        }
         .custom-toast {
             position: fixed;
             bottom: 30px;
@@ -120,6 +261,143 @@
                 <button class="btn-action btn-add-cart" style="width: 100%; padding: 15px; margin-top: 12px;" onclick="addToCartFromDetail('{{ $reptile->id }}', '{{ $reptile->name }}', '{{ $reptile->price }}', '{{ $reptile->image }}')">
                     Add to Cart 🛒
                 </button>
+            </div>
+        </div>
+    </div>
+
+    {{-- Deskripsi Produk Lengkap --}}
+    @php
+        $attrs     = is_array($reptile->attributes) ? $reptile->attributes : [];
+        $ageVal    = $attrs['age']    ?? $reptile->age    ?? null;
+        $morphVal  = $attrs['morph']  ?? $reptile->morph  ?? null;
+        $weightVal = $attrs['weight'] ?? $reptile->weight ?? null;
+        $descSingkat = $reptile->short_description ?? $reptile->desc ?? $reptile->description ?? null;
+    @endphp
+
+    <div class="desc-section-wrap">
+        <div class="desc-card">
+            <div class="desc-header">
+                <div class="desc-header-icon">
+                    <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                </div>
+                <div>
+                    <h2>Deskripsi Produk</h2>
+                    <p>Informasi lengkap tentang {{ $reptile->name }} — karakteristik, habitat, pakan, jenis, umur, dan cara perawatan.</p>
+                </div>
+            </div>
+
+            <div class="desc-divider"></div>
+
+            @if($descSingkat)
+                <p style="margin: 0 0 25px; font-size: 1rem; line-height: 1.8; color: #333; font-weight: 500;">
+                    {{ $descSingkat }}
+                </p>
+            @endif
+
+            <div class="desc-grid">
+                <div class="desc-info-card">
+                    <div class="desc-info-icon green">
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
+                    </div>
+                    <div class="desc-info-content">
+                        <div class="desc-info-label">Kategori</div>
+                        <div class="desc-info-value">{{ $reptile->category ?? 'Tidak diketahui' }}</div>
+                    </div>
+                </div>
+
+                <div class="desc-info-card">
+                    <div class="desc-info-icon purple">
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>
+                    </div>
+                    <div class="desc-info-content">
+                        <div class="desc-info-label">Jenis / Spesies</div>
+                        <div class="desc-info-value {{ empty($reptile->type_info) ? 'muted' : '' }}">{{ $reptile->type_info ?: 'Belum tersedia' }}</div>
+                    </div>
+                </div>
+
+                <div class="desc-info-card">
+                    <div class="desc-info-icon amber">
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    </div>
+                    <div class="desc-info-content">
+                        <div class="desc-info-label">Umur</div>
+                        <div class="desc-info-value {{ empty($ageVal) ? 'muted' : '' }}">{{ $ageVal ?: 'Belum tersedia' }}</div>
+                    </div>
+                </div>
+
+                <div class="desc-info-card">
+                    <div class="desc-info-icon blue">
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" /></svg>
+                    </div>
+                    <div class="desc-info-content">
+                        <div class="desc-info-label">Berat</div>
+                        <div class="desc-info-value {{ empty($weightVal) ? 'muted' : '' }}">{{ $weightVal ?: 'Belum tersedia' }}</div>
+                    </div>
+                </div>
+
+                <div class="desc-info-card">
+                    <div class="desc-info-icon rose">
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>
+                    </div>
+                    <div class="desc-info-content">
+                        <div class="desc-info-label">Ukuran Maks</div>
+                        <div class="desc-info-value {{ empty($reptile->max_size) ? 'muted' : '' }}">{{ $reptile->max_size ?: 'Belum tersedia' }}</div>
+                    </div>
+                </div>
+
+                <div class="desc-info-card">
+                    <div class="desc-info-icon teal">
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.871 4A17.926 17.926 0 003 12c0 2.874.673 5.59 1.871 8m14.258 0A17.926 17.926 0 0021 12c0-2.874-.673-5.59-1.871-8M9 9h1.246a1 1 0 01.961.725l1.586 5.55a1 1 0 00.961.725H15m1-7h-.08a2 2 0 00-1.519.698L9.6 15.302A2 2 0 018.08 16H8" /></svg>
+                    </div>
+                    <div class="desc-info-content">
+                        <div class="desc-info-label">Umur Hidup</div>
+                        <div class="desc-info-value {{ empty($reptile->lifespan) ? 'muted' : '' }}">{{ $reptile->lifespan ?: 'Belum tersedia' }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="desc-content-block">
+                <div class="desc-content-title">
+                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#6B8E4E" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>
+                    Karakteristik
+                    <span class="tag">Ciri & Sifat</span>
+                </div>
+                <div class="desc-content-text {{ empty($reptile->characteristic) ? 'empty' : '' }}">
+                    {{ $reptile->characteristic ?: 'Informasi karakteristik untuk unit ini belum tersedia. Silakan hubungi admin via WhatsApp untuk detail lebih lanjut.' }}
+                </div>
+            </div>
+
+            <div class="desc-content-block">
+                <div class="desc-content-title">
+                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#6B8E4E" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    Habitat Asli
+                    <span class="tag">Asal & Lingkungan</span>
+                </div>
+                <div class="desc-content-text {{ empty($reptile->habitat) ? 'empty' : '' }}">
+                    {{ $reptile->habitat ?: 'Informasi habitat untuk unit ini belum tersedia. Silakan hubungi admin via WhatsApp untuk detail lebih lanjut.' }}
+                </div>
+            </div>
+
+            <div class="desc-content-block">
+                <div class="desc-content-title">
+                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#6B8E4E" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3l1.664 1.664M21 21l-1.5-1.5m-5.485-1.242L12 17.25 4.5 21l1.5-7.5L1.5 9l7.5-.75L12 1.5l3 6.75L22.5 9l-5.5 4.5z" /></svg>
+                    Makanan (Pakan)
+                    <span class="tag">Diet & Nutrisi</span>
+                </div>
+                <div class="desc-content-text {{ empty($reptile->food) ? 'empty' : '' }}">
+                    {{ $reptile->food ?: 'Informasi pakan untuk unit ini belum tersedia. Silakan hubungi admin via WhatsApp untuk detail lebih lanjut.' }}
+                </div>
+            </div>
+
+            <div class="desc-content-block">
+                <div class="desc-content-title">
+                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#6B8E4E" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                    Cara Perawatan
+                    <span class="tag">Setup & Handling</span>
+                </div>
+                <div class="desc-content-text {{ empty($reptile->care_instructions) ? 'empty' : '' }}">
+                    {{ $reptile->care_instructions ?: 'Informasi cara perawatan untuk unit ini belum tersedia. Silakan hubungi admin via WhatsApp untuk konsultasi setup & handling.' }}
+                </div>
             </div>
         </div>
     </div>

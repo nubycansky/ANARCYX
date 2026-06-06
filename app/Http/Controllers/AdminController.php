@@ -206,11 +206,18 @@ class AdminController extends Controller
             'desc' => $request->desc,
             'description' => $request->desc,
             'short_description' => $request->short_description,
+            'characteristic' => $request->characteristic,
+            'habitat' => $request->habitat,
+            'food' => $request->food,
+            'type_info' => $request->type_info,
+            'care_instructions' => $request->care_instructions,
+            'lifespan' => $request->lifespan,
+            'max_size' => $request->max_size,
             'image' => $imageName,
             'attributes' => [
                 'morph' => $request->morph ?? 'Normal morph',
-                'weight' => 'Unknown',
-                'age' => 'Baby'
+                'weight' => $request->weight ?? 'Unknown',
+                'age' => $request->age ?? 'Baby'
             ]
         ]);
 
@@ -235,6 +242,27 @@ class AdminController extends Controller
         $product->desc = $request->desc;
         $product->description = $request->desc;
         $product->short_description = $request->short_description;
+        $product->characteristic = $request->characteristic;
+        $product->habitat = $request->habitat;
+        $product->food = $request->food;
+        $product->type_info = $request->type_info;
+        $product->care_instructions = $request->care_instructions;
+        $product->lifespan = $request->lifespan;
+        $product->max_size = $request->max_size;
+
+        if (isset($product->attributes) && is_array($product->attributes)) {
+            $product->attributes = array_merge($product->attributes, [
+                'morph' => $request->morph ?? ($product->attributes['morph'] ?? 'Normal morph'),
+                'weight' => $request->weight ?? ($product->attributes['weight'] ?? 'Unknown'),
+                'age' => $request->age ?? ($product->attributes['age'] ?? 'Baby'),
+            ]);
+        } else {
+            $product->attributes = [
+                'morph' => $request->morph ?? 'Normal morph',
+                'weight' => $request->weight ?? 'Unknown',
+                'age' => $request->age ?? 'Baby',
+            ];
+        }
 
         if ($request->hasFile('image')) {
             if($product->image && $product->image != 'default.jpg') {
@@ -590,9 +618,19 @@ class AdminController extends Controller
             return redirect()->route('admin.orders')
                 ->with('flash_error', 'Pesanan tidak ditemukan.');
         }
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.invoice_pdf', compact('order'));
-        $filename = 'invoice-' . ($order->order_id_string ?? substr($order->_id, 0, 8)) . '.pdf';
-        return $pdf->download($filename);
+        try {
+            $logoData = null;
+            $logoPath = public_path('images/logo/logo.jpeg');
+            if (file_exists($logoPath)) {
+                $logoData = 'data:image/' . pathinfo($logoPath, PATHINFO_EXTENSION) . ';base64,' . base64_encode(file_get_contents($logoPath));
+            }
+            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.invoice_pdf', compact('order', 'logoData'));
+            $filename = 'invoice-' . ($order->order_id_string ?? substr((string)$order->_id, 0, 8)) . '.pdf';
+            return $pdf->download($filename);
+        } catch (\Throwable $e) {
+            return redirect()->route('admin.orders')
+                ->with('flash_error', 'Gagal generate PDF: ' . $e->getMessage());
+        }
     }
 
     public function deleteArticle($id) {

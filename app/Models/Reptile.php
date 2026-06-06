@@ -23,6 +23,13 @@ class Reptile extends Model
         'image',
         'desc',
         'description',
-        'short_description'
+        'short_description',
+        'characteristic',
+        'habitat',
+        'food',
+        'type_info',
+        'care_instructions',
+        'lifespan',
+        'max_size',
     ];
 }

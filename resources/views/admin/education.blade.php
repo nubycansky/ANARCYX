@@ -317,7 +317,7 @@
                     </div>
                 </div>
                 <div class="modal-action-buttons">
-                    <button type="submit" class="btn-modal-save">Save to MongoDB</button>
+                    <button type="submit" class="btn-modal-save">Save</button>
                     <button type="button" class="btn-modal-cancel" onclick="closeFormModal()">Batal</button>
                 </div>
             </form>
